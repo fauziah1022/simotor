@@ -680,15 +680,15 @@ def main():
         if st.session_state.user['role'] == 'admin':
             menu = st.radio(
                 "📋 Menu",
-                ["📊 Dashboard", "🏍️ Motor", "👥 Pelanggan",
-                "🧾 Transaksi", "📈 Laporan", "🏢 Admin Pusat"],
+                ["📊 Dashboard",
+                "📈 Laporan", "🏢 Admin Pusat"],
                 label_visibility="collapsed"
             )
         else:
             menu = st.radio(
                 "📋 Menu",
-                ["📊 Dashboard", "🏍️ Motor", "👥 Pelanggan",
-                "🧾 Transaksi", "📈 Laporan"],
+                ["🏍️ Motor", "👥 Pelanggan",
+                "🧾 Transaksi",
                 label_visibility="collapsed"
             )   
         
