@@ -683,14 +683,14 @@ def main():
                 ["📊 Dashboard", "🏍️ Motor", "👥 Pelanggan",
                 "🧾 Transaksi", "📈 Laporan", "🏢 Admin Pusat"],
                 label_visibility="collapsed"
-        )
+            )
         else:
-            `menu = st.radio(
+            menu = st.radio(
                 "📋 Menu",
                 ["📊 Dashboard", "🏍️ Motor", "👥 Pelanggan",
                 "🧾 Transaksi", "📈 Laporan"],
                 label_visibility="collapsed"
-            )`
+            )   
         
         st.markdown("---")
         if st.button("🚪 Logout", use_container_width=True):
