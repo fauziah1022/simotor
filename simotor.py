@@ -108,8 +108,19 @@ def seed_data(c):
 
 def verify_login(username, password):
     conn = get_connection()
-    user = conn.execute("SELECT * FROM users WHERE username=?", (username,)).fetchone()
+    user = conn.execute(
+        "SELECT * FROM users WHERE username=?",
+        (username,)
+    ).fetchone()
     conn.close()
-    if user and bcrypt.checkpw(password.encode(), user['password'].encode()):
-        return dict(user)
+
+    if user:
+        stored_password = user['password']
+
+        if isinstance(stored_password, str):
+            stored_password = stored_password.encode()
+
+        if bcrypt.checkpw(password.encode(), stored_password):
+            return dict(user)
+
     return None
