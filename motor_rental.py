@@ -688,7 +688,7 @@ def main():
             menu = st.radio(
                 "📋 Menu",
                 ["🏍️ Motor", "👥 Pelanggan",
-                "🧾 Transaksi",
+                "🧾 Transaksi"],
                 label_visibility="collapsed"
             )   
         
