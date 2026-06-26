@@ -313,6 +313,14 @@ def motor_page():
                 tarif_jam = st.number_input("Tarif/Jam", min_value=0, value=10000)
                 tarif_hari = st.number_input("Tarif/Hari", min_value=0, value=80000)
                 status = st.selectbox("Status", ["tersedia","disewa","rusak","servis"])
+                foto = st.file_uploader(
+                    "📷 Upload Foto Motor",
+                    type=["jpg","jpeg","png"]
+                )
+
+                keterangan = st.text_area(
+                    "📝 Keterangan Motor"
+                )
             
             col_a, col_b = st.columns(2)
             with col_a:
@@ -320,8 +328,24 @@ def motor_page():
                     if nopol and merek:
                         conn = db.get_connection()
                         try:
-                            conn.execute("INSERT INTO motor (nopol,merek,jenis,tarif_jam,tarif_hari,status,cabang) VALUES (?,?,?,?,?,?,?)",
-                                        (nopol, merek, jenis, tarif_jam, tarif_hari, status, 'Cabang Asoka'))
+                            foto_data = foto.read() if foto else None
+
+                            conn.execute("""
+                            INSERT INTO motor
+                            (nopol,merek,jenis,tarif_jam,tarif_hari,status,cabang,foto,keterangan)
+                            VALUES (?,?,?,?,?,?,?,?,?)
+                            """,
+                            (
+                                nopol,
+                                merek,
+                                jenis,
+                                tarif_jam,
+                                tarif_hari,
+                                status,
+                                'Cabang Asoka',
+                                foto_data,
+                                keterangan
+                            ))
                             conn.commit()
                             st.success("✅ Motor berhasil ditambahkan!")
                             st.session_state.show_motor_form = False
@@ -349,17 +373,64 @@ def motor_page():
         selected = st.selectbox("Pilih Motor", df['nopol'].tolist())
         if selected:
             motor = df[df['nopol']==selected].iloc[0]
+            
+            if 'foto' in motor.index and motor['foto'] is not None:
+                st.image(
+                    bytes(motor['foto']),
+                    width=250,
+                    caption=motor['nopol']
+                )
             c1, c2, c3 = st.columns(3)
             with c1:
-                new_status = st.selectbox("Ubah Status", 
+                new_status = st.selectbox(
+                    "Ubah Status",
                     ["tersedia","disewa","rusak","servis"],
-                    index=["tersedia","disewa","rusak","servis"].index(motor['status']))
-                if st.button("💾 Update Status"):
+                    index=["tersedia","disewa","rusak","servis"].index(motor['status'])
+                )
+
+                new_foto = st.file_uploader(
+                    "📷 Ganti Foto Motor",
+                    type=["jpg","jpeg","png"],
+                    key="edit_foto"
+                )
+
+                new_keterangan = st.text_area(
+                    "📝 Keterangan Motor",
+                    value=motor['keterangan'] if 'keterangan' in motor.index else ""
+                )
+                if st.button("💾 Update Motor"):
                     conn = db.get_connection()
-                    conn.execute("UPDATE motor SET status=? WHERE id=?", (new_status, motor['id']))
+
+                    if new_foto:
+                        foto_data = new_foto.read()
+
+                        conn.execute("""
+                        UPDATE motor
+                        SET status=?, foto=?, keterangan=?
+                        WHERE id=?
+                        """,
+                        (
+                            new_status,
+                            foto_data,
+                            new_keterangan,
+                            motor['id']
+                        ))
+                    else:
+                        conn.execute("""
+                        UPDATE motor
+                        SET status=?, keterangan=?
+                        WHERE id=?
+                        """,
+                        (
+                            new_status,
+                            new_keterangan,
+                            motor['id']
+                        ))
+
                     conn.commit()
                     conn.close()
-                    st.success("Status updated!")
+
+                    st.success("✅ Data motor berhasil diperbarui!")
                     st.rerun()
             with c2:
                 if st.button("🗑️ Hapus Motor"):
@@ -484,11 +555,20 @@ def transaksi_page():
     
     with tab2:
         trx_aktif = get_df("""
-            SELECT t.id, p.nama, m.nopol, m.merek, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya
+            SELECT
+                t.id,
+                t.motor_id,
+                p.nama,
+                m.nopol,
+                m.merek,
+                t.tgl_sewa,
+                t.durasi,
+                t.satuan,
+                t.total_biaya
             FROM transaksi t
             JOIN pelanggan p ON t.pelanggan_id = p.id
             JOIN motor m ON t.motor_id = m.id
-            WHERE t.status = 'aktif'
+            WHERE t.status='aktif'
         """)
         if trx_aktif.empty:
             st.info("Tidak ada transaksi aktif")
@@ -512,7 +592,7 @@ def transaksi_page():
                 
                 conn = db.get_connection()
                 conn.execute("UPDATE transaksi SET status='selesai' WHERE id=?", (selected,))
-                conn.execute("UPDATE motor SET status='tersedia' WHERE id=?", (trx['merek'],))
+                conn.execute("UPDATE motor SET status='tersedia' WHERE id=?", (trx['motor_id'],))
                 conn.execute("INSERT INTO pengembalian (transaksi_id,tgl_kembali,denda,total_bayar) VALUES (?,?,?,?)",
                             (selected, tgl_kembali.strftime('%Y-%m-%d'), denda, total_bayar))
                 conn.commit()
@@ -562,7 +642,7 @@ def laporan_page():
         filter_date = f"tgl_sewa BETWEEN '{start}' AND '{tanggal}'"
     
     df = get_df(f"""
-        SELECT t.id, p.nama, m.nopol, m.merek, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya, t.status
+        SELECT t.id, t.motor_id, p.nama, m.nopol, m.merek, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya, t.status
         FROM transaksi t
         JOIN pelanggan p ON t.pelanggan_id = p.id
         JOIN motor m ON t.motor_id = m.id
@@ -654,6 +734,39 @@ def admin_page():
         'Data Pending': [0, 2]
     })
     st.dataframe(sync_data, use_container_width=True, hide_index=True)
+    st.markdown("---")
+    st.subheader("📷 Monitoring Motor Cabang")
+
+    motor_df = get_df("""
+    SELECT id,nopol,merek,status,keterangan,foto
+    FROM motor
+    """)
+
+    for _, row in motor_df.iterrows():
+
+        col1, col2 = st.columns([1,2])
+
+        with col1:
+            if row["foto"] is not None:
+                st.image(
+                    bytes(row["foto"]),
+                    width=220,
+                    caption=row["nopol"]
+                )
+
+        with col2:
+            st.write(f"**Motor:** {row['merek']}")
+            st.write(f"**Status:** {row['status']}")
+            st.write(f"**Keterangan:** {row['keterangan']}")
+
+            if row["foto"] is not None:
+                st.download_button(
+                    "⬇️ Download Foto",
+                    data=bytes(row["foto"]),
+                    file_name=f"{row['nopol']}.jpg",
+                    mime="image/jpeg",
+                    key=f"dl_{row['id']}"
+                )
 
 # ============ MAIN APP ============
 def main():

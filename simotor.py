@@ -21,8 +21,15 @@ def init_db():
     
     c.execute('''CREATE TABLE IF NOT EXISTS motor (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nopol TEXT UNIQUE, merek TEXT, jenis TEXT,
-        tarif_jam REAL, tarif_hari REAL, status TEXT, cabang TEXT
+        nopol TEXT UNIQUE,
+        merek TEXT,
+        jenis TEXT,
+        tarif_jam REAL,
+        tarif_hari REAL,
+        status TEXT,
+        cabang TEXT,
+        foto BLOB,
+        keterangan TEXT
     )''')
     
     c.execute('''CREATE TABLE IF NOT EXISTS pelanggan (
@@ -42,6 +49,17 @@ def init_db():
         transaksi_id INTEGER, tgl_kembali TEXT,
         denda REAL, total_bayar REAL
     )''')
+
+    # TAMBAHKAN DI SINI
+    try:
+        c.execute("ALTER TABLE motor ADD COLUMN foto BLOB")
+    except:
+        pass
+
+    try:
+        c.execute("ALTER TABLE motor ADD COLUMN keterangan TEXT")
+    except:
+        pass
     
     # Seed data jika kosong
     if c.execute("SELECT COUNT(*) FROM users").fetchone()[0] == 0:
@@ -52,23 +70,41 @@ def init_db():
 
 def seed_data(c):
     # Users (password: admin123 & petugas123)
-    c.execute("INSERT INTO users VALUES (1,'admin',?,'admin','Pusat')",
-              (bcrypt.hashpw(b'admin123', bcrypt.gensalt()),))
-    c.execute("INSERT INTO users VALUES (2,'petugas1',?,'petugas','Cabang Asoka')",
-              (bcrypt.hashpw(b'petugas123', bcrypt.gensalt()),))
+    c.execute("""
+        INSERT INTO users
+        (username,password,role,cabang)
+        VALUES (?,?,?,?)
+        """,
+        (
+            'admin',
+            bcrypt.hashpw(b'admin123', bcrypt.gensalt()),
+            'admin',
+            'Pusat'
+        ))
+    c.execute("""
+        INSERT INTO users
+        (username,password,role,cabang)
+        VALUES (?,?,?,?)
+        """,
+        (
+            'petugas1',
+            bcrypt.hashpw(b'petugas123', bcrypt.gensalt()),
+            'petugas',
+            'Cabang Asoka'
+        ))
     
     # Motor
     motors = [
-        ('AB 1234 CD', 'Honda Vario', 'Matic', 10000, 80000, 'tersedia', 'Cabang Asoka'),
-        ('AB 5678 EF', 'Yamaha NMAX', 'Matic', 15000, 120000, 'tersedia', 'Cabang Asoka'),
-        ('AB 9012 GH', 'Honda Beat', 'Matic', 8000, 65000, 'disewa', 'Cabang Asoka'),
-        ('AB 3456 IJ', 'Yamaha Mio', 'Matic', 8000, 65000, 'tersedia', 'Cabang Asoka'),
-        ('AB 7890 KL', 'Honda PCX', 'Matic', 18000, 150000, 'servis', 'Cabang Asoka'),
-        ('AB 2345 MN', 'Suzuki Address', 'Matic', 9000, 70000, 'tersedia', 'Cabang Asoka'),
-        ('AB 6789 OP', 'Honda Scoopy', 'Matic', 10000, 80000, 'disewa', 'Cabang Asoka'),
-        ('AB 1357 QR', 'Yamaha Lexi', 'Matic', 12000, 95000, 'tersedia', 'Cabang Asoka'),
+        ('AB 1234 CD', 'Honda Vario', 'Matic', 10000, 80000, 'tersedia', 'Cabang Asoka',None,""),
+        ('AB 5678 EF', 'Yamaha NMAX', 'Matic', 15000, 120000, 'tersedia', 'Cabang Asoka',None,""),
+        ('AB 9012 GH', 'Honda Beat', 'Matic', 8000, 65000, 'disewa', 'Cabang Asoka',None,""),
+        ('AB 3456 IJ', 'Yamaha Mio', 'Matic', 8000, 65000, 'tersedia', 'Cabang Asoka',None,""),
+        ('AB 7890 KL', 'Honda PCX', 'Matic', 18000, 150000, 'servis', 'Cabang Asoka',None,""),
+        ('AB 2345 MN', 'Suzuki Address', 'Matic', 9000, 70000, 'tersedia', 'Cabang Asoka',None,""),
+        ('AB 6789 OP', 'Honda Scoopy', 'Matic', 10000, 80000, 'disewa', 'Cabang Asoka',None,""),
+        ('AB 1357 QR', 'Yamaha Lexi', 'Matic', 12000, 95000, 'tersedia', 'Cabang Asoka',None,""),
     ]
-    c.executemany("INSERT INTO motor (nopol,merek,jenis,tarif_jam,tarif_hari,status,cabang) VALUES (?,?,?,?,?,?,?)", motors)
+    c.executemany("INSERT INTO motor (nopol,merek,jenis,tarif_jam,tarif_hari,status,cabang,foto,keterangan) VALUES (?,?,?,?,?,?,?,?,?)", motors)
     
     # Pelanggan
     pelanggan = [
