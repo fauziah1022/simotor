@@ -135,10 +135,16 @@ def show_toast(msg, type="success"):
 def format_rp(num):
     return f"Rp {int(num):,}".replace(",", ".")
 
-def get_df(query):
+def get_df(query, params=None):
+    """Run a SELECT and return a DataFrame.
+    Always pass user-controlled values via `params` (parameterized query)
+    instead of string-formatting them into the SQL itself.
+    """
     conn = db.get_connection()
-    df = pd.read_sql_query(query, conn)
-    conn.close()
+    try:
+        df = pd.read_sql_query(query, conn, params=params)
+    finally:
+        conn.close()
     return df
 
 # ============ LOGIN PAGE ============
@@ -184,7 +190,7 @@ def dashboard_page():
     
     # Stats
     today = datetime.now().strftime('%Y-%m-%d')
-    trx_hari_ini = get_df(f"SELECT COUNT(*) c FROM transaksi WHERE tgl_sewa='{today}'").iloc[0]['c']
+    trx_hari_ini = get_df("SELECT COUNT(*) c FROM transaksi WHERE tgl_sewa=?", (today,)).iloc[0]['c']
     motor_tersedia = get_df("SELECT COUNT(*) c FROM motor WHERE status='tersedia'").iloc[0]['c']
     motor_disewa = get_df("SELECT COUNT(*) c FROM motor WHERE status='disewa'").iloc[0]['c']
     pendapatan = get_df("SELECT COALESCE(SUM(total_bayar),0) t FROM pengembalian").iloc[0]['t']
@@ -235,20 +241,26 @@ def dashboard_page():
             WHERE tgl_sewa >= date('now', '-7 days')
             GROUP BY tgl_sewa ORDER BY tgl_sewa
         """)
-        fig = px.line(df_trx, x='tgl_sewa', y='jumlah', markers=True,
-                      labels={'tgl_sewa':'Tanggal','jumlah':'Jumlah Transaksi'})
-        fig.update_traces(line=dict(color='#667eea', width=3))
-        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', height=350)
-        st.plotly_chart(fig, use_container_width=True)
+        if df_trx.empty:
+            st.info("Belum ada transaksi dalam 7 hari terakhir.")
+        else:
+            fig = px.line(df_trx, x='tgl_sewa', y='jumlah', markers=True,
+                          labels={'tgl_sewa':'Tanggal','jumlah':'Jumlah Transaksi'})
+            fig.update_traces(line=dict(color='#667eea', width=3))
+            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', height=350)
+            st.plotly_chart(fig, use_container_width=True)
     
     with col2:
         st.subheader("🏍️ Status Motor")
         df_status = get_df("SELECT status, COUNT(*) as jumlah FROM motor GROUP BY status")
-        colors = {'tersedia':'#10b981','disewa':'#f59e0b','rusak':'#ef4444','servis':'#6b7280'}
-        fig = px.pie(df_status, values='jumlah', names='status',
-                     color='status', color_discrete_map=colors, hole=0.5)
-        fig.update_layout(height=350)
-        st.plotly_chart(fig, use_container_width=True)
+        if df_status.empty:
+            st.info("Belum ada data motor.")
+        else:
+            colors = {'tersedia':'#10b981','disewa':'#f59e0b','rusak':'#ef4444','servis':'#6b7280'}
+            fig = px.pie(df_status, values='jumlah', names='status',
+                         color='status', color_discrete_map=colors, hole=0.5)
+            fig.update_layout(height=350)
+            st.plotly_chart(fig, use_container_width=True)
     
     # Pendapatan 30 hari
     st.subheader("💵 Pendapatan 30 Hari Terakhir")
@@ -258,11 +270,14 @@ def dashboard_page():
         WHERE tgl_kembali >= date('now', '-30 days')
         GROUP BY tgl_kembali ORDER BY tgl_kembali
     """)
-    fig = px.area(df_pendapatan, x='tanggal', y='pendapatan',
-                  labels={'tanggal':'Tanggal','pendapatan':'Pendapatan (Rp)'})
-    fig.update_traces(fillcolor='rgba(102,126,234,0.3)', line=dict(color='#667eea', width=2))
-    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', height=350)
-    st.plotly_chart(fig, use_container_width=True)
+    if df_pendapatan.empty:
+        st.info("Belum ada data pendapatan dalam 30 hari terakhir.")
+    else:
+        fig = px.area(df_pendapatan, x='tanggal', y='pendapatan',
+                      labels={'tanggal':'Tanggal','pendapatan':'Pendapatan (Rp)'})
+        fig.update_traces(fillcolor='rgba(102,126,234,0.3)', line=dict(color='#667eea', width=2))
+        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', height=350)
+        st.plotly_chart(fig, use_container_width=True)
     
     # Transaksi terbaru
     st.subheader("📝 Transaksi Terbaru")
@@ -273,8 +288,11 @@ def dashboard_page():
         JOIN motor m ON t.motor_id = m.id
         ORDER BY t.tgl_sewa DESC LIMIT 10
     """)
-    df_recent['total_biaya'] = df_recent['total_biaya'].apply(format_rp)
-    st.dataframe(df_recent, use_container_width=True, hide_index=True)
+    if df_recent.empty:
+        st.info("Belum ada transaksi.")
+    else:
+        df_recent['total_biaya'] = df_recent['total_biaya'].apply(format_rp)
+        st.dataframe(df_recent, use_container_width=True, hide_index=True)
 
 # ============ MOTOR PAGE ============
 def motor_page():
@@ -291,13 +309,21 @@ def motor_page():
     with col2:
         filter_status = st.selectbox("Filter Status", ["semua","tersedia","disewa","rusak","servis"])
     
+    # Build query with parameter placeholders instead of string-formatting
+    # user input directly into SQL (the old version was vulnerable to SQL
+    # injection and would also crash on values containing a single quote,
+    # e.g. searching for a customer/motor name with an apostrophe).
     query = "SELECT * FROM motor WHERE 1=1"
+    params = []
     if search:
-        query += f" AND (nopol LIKE '%{search}%' OR merek LIKE '%{search}%')"
+        query += " AND (nopol LIKE ? OR merek LIKE ?)"
+        like = f"%{search}%"
+        params.extend([like, like])
     if filter_status != "semua":
-        query += f" AND status = '{filter_status}'"
+        query += " AND status = ?"
+        params.append(filter_status)
     
-    df = get_df(query)
+    df = get_df(query, tuple(params) if params else None)
     
     if st.button("➕ Tambah Motor Baru"):
         st.session_state.show_motor_form = True
@@ -354,6 +380,8 @@ def motor_page():
                             st.error(f"Error: {e}")
                         finally:
                             conn.close()
+                    else:
+                        st.error("Nomor Polisi dan Merek wajib diisi!")
             with col_b:
                 if st.form_submit_button("❌ Batal", use_container_width=True):
                     st.session_state.show_motor_form = False
@@ -361,10 +389,8 @@ def motor_page():
     
     # Display table with status badge
     if not df.empty:
-        df_display = df.copy()
-        df_display['total_biaya_display'] = df_display['tarif_hari'].apply(format_rp)
         st.dataframe(
-            df_display[['nopol','merek','jenis','tarif_jam','tarif_hari','status']],
+            df[['nopol','merek','jenis','tarif_jam','tarif_hari','status']],
             use_container_width=True, hide_index=True
         )
         
@@ -396,50 +422,54 @@ def motor_page():
 
                 new_keterangan = st.text_area(
                     "📝 Keterangan Motor",
-                    value=motor['keterangan'] if 'keterangan' in motor.index else ""
+                    value=motor['keterangan'] if ('keterangan' in motor.index and motor['keterangan'] is not None) else ""
                 )
                 if st.button("💾 Update Motor"):
                     conn = db.get_connection()
-
-                    if new_foto:
-                        foto_data = new_foto.read()
-
-                        conn.execute("""
-                        UPDATE motor
-                        SET status=?, foto=?, keterangan=?
-                        WHERE id=?
-                        """,
-                        (
-                            new_status,
-                            foto_data,
-                            new_keterangan,
-                            motor['id']
-                        ))
-                    else:
-                        conn.execute("""
-                        UPDATE motor
-                        SET status=?, keterangan=?
-                        WHERE id=?
-                        """,
-                        (
-                            new_status,
-                            new_keterangan,
-                            motor['id']
-                        ))
-
-                    conn.commit()
-                    conn.close()
-
-                    st.success("✅ Data motor berhasil diperbarui!")
-                    st.rerun()
+                    try:
+                        if new_foto:
+                            foto_data = new_foto.read()
+                            conn.execute("""
+                            UPDATE motor
+                            SET status=?, foto=?, keterangan=?
+                            WHERE id=?
+                            """,
+                            (
+                                new_status,
+                                foto_data,
+                                new_keterangan,
+                                int(motor['id'])
+                            ))
+                        else:
+                            conn.execute("""
+                            UPDATE motor
+                            SET status=?, keterangan=?
+                            WHERE id=?
+                            """,
+                            (
+                                new_status,
+                                new_keterangan,
+                                int(motor['id'])
+                            ))
+                        conn.commit()
+                        st.success("✅ Data motor berhasil diperbarui!")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+                    finally:
+                        conn.close()
             with c2:
                 if st.button("🗑️ Hapus Motor"):
                     conn = db.get_connection()
-                    conn.execute("DELETE FROM motor WHERE id=?", (motor['id'],))
-                    conn.commit()
-                    conn.close()
-                    st.success("Motor dihapus!")
-                    st.rerun()
+                    try:
+                        conn.execute("DELETE FROM motor WHERE id=?", (int(motor['id']),))
+                        conn.commit()
+                        st.success("Motor dihapus!")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+                    finally:
+                        conn.close()
     else:
         st.info("Tidak ada data motor yang cocok.")
 
@@ -456,10 +486,11 @@ def pelanggan_page():
     
     with tab1:
         search = st.text_input("🔍 Cari pelanggan")
-        query = "SELECT * FROM pelanggan"
         if search:
-            query += f" WHERE nama LIKE '%{search}%' OR ktp LIKE '%{search}%'"
-        df = get_df(query)
+            like = f"%{search}%"
+            df = get_df("SELECT * FROM pelanggan WHERE nama LIKE ? OR ktp LIKE ?", (like, like))
+        else:
+            df = get_df("SELECT * FROM pelanggan")
         if not df.empty:
             st.dataframe(df, use_container_width=True, hide_index=True)
         else:
@@ -513,44 +544,67 @@ def transaksi_page():
         with st.form("trx_form"):
             c1, c2 = st.columns(2)
             with c1:
-                pel_id = st.selectbox("Pilih Pelanggan", 
-                    pel_list['nama'] + ' (' + pel_list['ktp'] + ')')
-                pel_id = pel_list.iloc[[i for i,x in enumerate(pel_list['nama'] + ' (' + pel_list['ktp'] + ')') if x==pel_id][0]]['id']
-                
-                motor_sel = st.selectbox("Pilih Motor", 
-                    motor_list['nopol'] + ' - ' + motor_list['merek'])
-                motor_id = motor_list.iloc[[i for i,x in enumerate(motor_list['nopol'] + ' - ' + motor_list['merek']) if x==motor_sel][0]]
+                # Use format_func so the selectbox displays a friendly label
+                # while keeping the underlying value as the actual row id.
+                # The old version matched on the rendered string itself,
+                # which breaks (picks the wrong row, or crashes with an
+                # IndexError) whenever two customers/motors render the same
+                # display text.
+                pel_choice_id = st.selectbox(
+                    "Pilih Pelanggan",
+                    pel_list['id'].tolist(),
+                    format_func=lambda pid: (
+                        f"{pel_list.loc[pel_list['id']==pid, 'nama'].values[0]} "
+                        f"({pel_list.loc[pel_list['id']==pid, 'ktp'].values[0]})"
+                    )
+                )
+                pel_id = int(pel_choice_id)
+
+                motor_choice_id = st.selectbox(
+                    "Pilih Motor",
+                    motor_list['id'].tolist(),
+                    format_func=lambda mid: (
+                        f"{motor_list.loc[motor_list['id']==mid, 'nopol'].values[0]} - "
+                        f"{motor_list.loc[motor_list['id']==mid, 'merek'].values[0]}"
+                    )
+                )
+                motor_row = motor_list[motor_list['id'] == motor_choice_id].iloc[0]
+                motor_sel = f"{motor_row['nopol']} - {motor_row['merek']}"
             with c2:
                 durasi = st.number_input("Durasi", min_value=1, value=1)
                 satuan = st.selectbox("Satuan", ["hari","jam"])
                 
-                tarif = motor_id['tarif_hari'] if satuan == 'hari' else motor_id['tarif_jam']
+                tarif = motor_row['tarif_hari'] if satuan == 'hari' else motor_row['tarif_jam']
                 total = tarif * durasi
                 st.metric("💰 Total Biaya", format_rp(total))
             
             if st.form_submit_button("✅ Simpan Transaksi"):
                 conn = db.get_connection()
-                conn.execute("""INSERT INTO transaksi (pelanggan_id,motor_id,tgl_sewa,durasi,satuan,total_biaya,status,cabang) 
-                               VALUES (?,?,?,?,?,?,?,?)""",
-                            (pel_id, motor_id['id'], datetime.now().strftime('%Y-%m-%d'), 
-                             durasi, satuan, total, 'aktif', 'Cabang Asoka'))
-                conn.execute("UPDATE motor SET status='disewa' WHERE id=?", (motor_id['id'],))
-                conn.commit()
-                conn.close()
-                st.success("✅ Transaksi berhasil disimpan!")
-                
-                # Struk
-                st.markdown(f"""
-                <div style="background:#f9fafb; padding:20px; border-radius:10px; margin-top:20px; border:2px dashed #667eea;">
-                    <h3 style="text-align:center;">🧾 STRUK SEWA MOTOR</h3>
-                    <hr>
-                    <p><b>Tanggal:</b> {datetime.now().strftime('%d-%m-%Y %H:%M')}</p>
-                    <p><b>Motor:</b> {motor_sel}</p>
-                    <p><b>Durasi:</b> {durasi} {satuan}</p>
-                    <p><b>Total:</b> {format_rp(total)}</p>
-                    <p style="text-align:center; margin-top:20px;"><i>Terima kasih telah menggunakan layanan kami!</i></p>
-                </div>
-                """, unsafe_allow_html=True)
+                try:
+                    conn.execute("""INSERT INTO transaksi (pelanggan_id,motor_id,tgl_sewa,durasi,satuan,total_biaya,status,cabang) 
+                                   VALUES (?,?,?,?,?,?,?,?)""",
+                                (pel_id, int(motor_row['id']), datetime.now().strftime('%Y-%m-%d'), 
+                                 durasi, satuan, total, 'aktif', 'Cabang Asoka'))
+                    conn.execute("UPDATE motor SET status='disewa' WHERE id=?", (int(motor_row['id']),))
+                    conn.commit()
+                    st.success("✅ Transaksi berhasil disimpan!")
+                    
+                    # Struk
+                    st.markdown(f"""
+                    <div style="background:#f9fafb; padding:20px; border-radius:10px; margin-top:20px; border:2px dashed #667eea;">
+                        <h3 style="text-align:center;">🧾 STRUK SEWA MOTOR</h3>
+                        <hr>
+                        <p><b>Tanggal:</b> {datetime.now().strftime('%d-%m-%Y %H:%M')}</p>
+                        <p><b>Motor:</b> {motor_sel}</p>
+                        <p><b>Durasi:</b> {durasi} {satuan}</p>
+                        <p><b>Total:</b> {format_rp(total)}</p>
+                        <p style="text-align:center; margin-top:20px;"><i>Terima kasih telah menggunakan layanan kami!</i></p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Error: {e}")
+                finally:
+                    conn.close()
                 st.rerun()
     
     with tab2:
@@ -591,14 +645,17 @@ def transaksi_page():
                 total_bayar = trx['total_biaya'] + denda
                 
                 conn = db.get_connection()
-                conn.execute("UPDATE transaksi SET status='selesai' WHERE id=?", (selected,))
-                conn.execute("UPDATE motor SET status='tersedia' WHERE id=?", (trx['motor_id'],))
-                conn.execute("INSERT INTO pengembalian (transaksi_id,tgl_kembali,denda,total_bayar) VALUES (?,?,?,?)",
-                            (selected, tgl_kembali.strftime('%Y-%m-%d'), denda, total_bayar))
-                conn.commit()
-                conn.close()
-                
-                st.success(f"✅ Pengembalian berhasil! Denda: {format_rp(denda)} | Total: {format_rp(total_bayar)}")
+                try:
+                    conn.execute("UPDATE transaksi SET status='selesai' WHERE id=?", (int(selected),))
+                    conn.execute("UPDATE motor SET status='tersedia' WHERE id=?", (int(trx['motor_id']),))
+                    conn.execute("INSERT INTO pengembalian (transaksi_id,tgl_kembali,denda,total_bayar) VALUES (?,?,?,?)",
+                                (int(selected), tgl_kembali.strftime('%Y-%m-%d'), denda, total_bayar))
+                    conn.commit()
+                    st.success(f"✅ Pengembalian berhasil! Denda: {format_rp(denda)} | Total: {format_rp(total_bayar)}")
+                except Exception as e:
+                    st.error(f"Error: {e}")
+                finally:
+                    conn.close()
                 st.rerun()
     
     with tab3:
@@ -609,8 +666,11 @@ def transaksi_page():
             JOIN motor m ON t.motor_id = m.id
             ORDER BY t.tgl_sewa DESC
         """)
-        df['total_biaya'] = df['total_biaya'].apply(format_rp)
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        if df.empty:
+            st.info("Belum ada riwayat transaksi.")
+        else:
+            df['total_biaya'] = df['total_biaya'].apply(format_rp)
+            st.dataframe(df, use_container_width=True, hide_index=True)
 
 # ============ LAPORAN PAGE ============
 def laporan_page():
@@ -631,33 +691,42 @@ def laporan_page():
         st.write("")
         export = st.button("📥 Export Excel")
     
-    # Query berdasarkan periode
+    # Query berdasarkan periode (still parameterized -- tanggal is a
+    # date object from st.date_input, not raw user text, but we pass it
+    # as a bound parameter regardless to stay consistent and safe).
+    tanggal_str = tanggal.strftime('%Y-%m-%d')
     if periode == "Harian":
-        filter_date = f"DATE(tgl_sewa) = '{tanggal}'"
+        filter_clause = "DATE(t.tgl_sewa) = ?"
+        filter_params = [tanggal_str]
     elif periode == "Mingguan":
         start = (tanggal - timedelta(days=7)).strftime('%Y-%m-%d')
-        filter_date = f"tgl_sewa BETWEEN '{start}' AND '{tanggal}'"
+        filter_clause = "t.tgl_sewa BETWEEN ? AND ?"
+        filter_params = [start, tanggal_str]
     else:
         start = tanggal.replace(day=1).strftime('%Y-%m-%d')
-        filter_date = f"tgl_sewa BETWEEN '{start}' AND '{tanggal}'"
+        filter_clause = "t.tgl_sewa BETWEEN ? AND ?"
+        filter_params = [start, tanggal_str]
     
     df = get_df(f"""
         SELECT t.id, t.motor_id, p.nama, m.nopol, m.merek, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya, t.status
         FROM transaksi t
         JOIN pelanggan p ON t.pelanggan_id = p.id
         JOIN motor m ON t.motor_id = m.id
-        WHERE {filter_date}
+        WHERE {filter_clause}
         ORDER BY t.tgl_sewa DESC
-    """)
+    """, tuple(filter_params))
     
     # Summary
     c1, c2, c3, c4 = st.columns(4)
     with c1: st.metric("Total Transaksi", len(df))
-    with c2: st.metric("Total Pendapatan", format_rp(df['total_biaya'].sum()))
+    with c2: st.metric("Total Pendapatan", format_rp(df['total_biaya'].sum() if len(df) > 0 else 0))
     with c3: st.metric("Rata-rata/Transaksi", format_rp(df['total_biaya'].mean() if len(df)>0 else 0))
-    with c4: st.metric("Motor Tersewa", df['motor_id'].nunique() if 'motor_id' in df.columns else 0)
+    with c4: st.metric("Motor Tersewa", df['motor_id'].nunique() if not df.empty else 0)
     
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    if df.empty:
+        st.info("Tidak ada transaksi pada periode ini.")
+    else:
+        st.dataframe(df, use_container_width=True, hide_index=True)
     
     if export and not df.empty:
         buffer = io.BytesIO()
@@ -666,6 +735,8 @@ def laporan_page():
         st.download_button("⬇️ Download Excel", buffer.getvalue(),
                           f"laporan_{periode.lower()}_{tanggal}.xlsx",
                           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    elif export and df.empty:
+        st.warning("Tidak ada data untuk diexport pada periode ini.")
 
 # ============ ADMIN PAGE ============
 def admin_page():
@@ -709,9 +780,12 @@ def admin_page():
             SELECT strftime('%Y-%m', tgl_sewa) as bulan, COUNT(*) as jumlah
             FROM transaksi GROUP BY bulan ORDER BY bulan
         """)
-        fig = px.bar(df_monthly, x='bulan', y='jumlah')
-        fig.update_traces(marker_color='#667eea')
-        st.plotly_chart(fig, use_container_width=True)
+        if df_monthly.empty:
+            st.info("Belum ada data transaksi.")
+        else:
+            fig = px.bar(df_monthly, x='bulan', y='jumlah')
+            fig.update_traces(marker_color='#667eea')
+            st.plotly_chart(fig, use_container_width=True)
     
     with col2:
         st.subheader("🏍️ Motor Terpopuler")
@@ -720,9 +794,12 @@ def admin_page():
             FROM transaksi t JOIN motor m ON t.motor_id = m.id
             GROUP BY m.merek ORDER BY jumlah DESC LIMIT 5
         """)
-        fig = px.bar(df_pop, x='jumlah', y='merek', orientation='h')
-        fig.update_traces(marker_color='#10b981')
-        st.plotly_chart(fig, use_container_width=True)
+        if df_pop.empty:
+            st.info("Belum ada data transaksi.")
+        else:
+            fig = px.bar(df_pop, x='jumlah', y='merek', orientation='h')
+            fig.update_traces(marker_color='#10b981')
+            st.plotly_chart(fig, use_container_width=True)
     
     # Monitoring Sync
     st.subheader("🔄 Status Sinkronisasi Cabang")
@@ -738,35 +815,40 @@ def admin_page():
     st.subheader("📷 Monitoring Motor Cabang")
 
     motor_df = get_df("""
-    SELECT id,nopol,merek,status,keterangan,foto
-    FROM motor
+        SELECT id,nopol,merek,status,keterangan,foto
+        FROM motor
     """)
 
-    for _, row in motor_df.iterrows():
+    if motor_df.empty:
+        st.info("Belum ada data motor.")
+    else:
+        for _, row in motor_df.iterrows():
 
-        col1, col2 = st.columns([1,2])
+            col1, col2 = st.columns([1,2])
 
-        with col1:
-            if row["foto"] is not None:
-                st.image(
-                    bytes(row["foto"]),
-                    width=220,
-                    caption=row["nopol"]
-                )
+            with col1:
+                if row["foto"] is not None:
+                    st.image(
+                        bytes(row["foto"]),
+                        width=220,
+                        caption=row["nopol"]
+                    )
+                else:
+                    st.markdown("*Tidak ada foto*")
 
-        with col2:
-            st.write(f"**Motor:** {row['merek']}")
-            st.write(f"**Status:** {row['status']}")
-            st.write(f"**Keterangan:** {row['keterangan']}")
+            with col2:
+                st.write(f"**Motor:** {row['merek']}")
+                st.write(f"**Status:** {row['status']}")
+                st.write(f"**Keterangan:** {row['keterangan'] if row['keterangan'] else '-'}")
 
-            if row["foto"] is not None:
-                st.download_button(
-                    "⬇️ Download Foto",
-                    data=bytes(row["foto"]),
-                    file_name=f"{row['nopol']}.jpg",
-                    mime="image/jpeg",
-                    key=f"dl_{row['id']}"
-                )
+                if row["foto"] is not None:
+                    st.download_button(
+                        "⬇️ Download Foto",
+                        data=bytes(row["foto"]),
+                        file_name=f"{row['nopol']}.jpg",
+                        mime="image/jpeg",
+                        key=f"dl_{row['id']}"
+                    )
 
 # ============ MAIN APP ============
 def main():
