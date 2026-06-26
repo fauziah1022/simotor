@@ -17,100 +17,254 @@ st.set_page_config(
 # ============ CUSTOM CSS + HTML ============
 CUSTOM_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
-/* Sidebar Styling */
-[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
-    color: white;
+/* Background Utama */
+.stApp {
+    background:
+    linear-gradient(
+        135deg,
+        #eef2ff 0%,
+        #fdf4ff 50%,
+        #ecfeff 100%
+    );
 }
-[data-testid="stSidebar"] .stMarkdown { color: white; }
-[data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, 
-[data-testid="stSidebar"] h3 { color: white !important; }
+
+/* Sidebar */
+[data-testid="stSidebar"]{
+    background:
+    linear-gradient(
+        180deg,
+        #312e81,
+        #4338ca,
+        #6366f1
+    );
+    border-right:1px solid rgba(255,255,255,0.1);
+}
+
+[data-testid="stSidebar"] *{
+    color:white !important;
+}
 
 /* Header */
-.main-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 2rem;
-    border-radius: 15px;
-    color: white;
-    margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+.main-header{
+    background:
+    linear-gradient(
+        135deg,
+        rgba(99,102,241,.95),
+        rgba(168,85,247,.95)
+    );
+
+    backdrop-filter: blur(20px);
+
+    padding:2rem;
+    border-radius:25px;
+
+    color:white;
+
+    box-shadow:
+    0 20px 40px rgba(99,102,241,.25);
+
+    margin-bottom:25px;
 }
-.main-header h1 { margin: 0; font-weight: 700; }
-.main-header p { margin: 0.5rem 0 0 0; opacity: 0.9; }
 
-/* Stat Cards */
-.stat-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    border-left: 5px solid #667eea;
-    transition: transform 0.2s;
+.main-header h1{
+    margin:0;
+    font-weight:700;
 }
-.stat-card:hover { transform: translateY(-3px); }
-.stat-card.green { border-left-color: #10b981; }
-.stat-card.orange { border-left-color: #f59e0b; }
-.stat-card.red { border-left-color: #ef4444; }
-.stat-card.purple { border-left-color: #8b5cf6; }
 
-.stat-card h3 { font-size: 0.85rem; color: #6b7280; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
-.stat-card .value { font-size: 2rem; font-weight: 700; color: #111827; margin: 0.5rem 0; }
-.stat-card .icon { font-size: 2rem; float: right; opacity: 0.3; }
-
-/* Table Styling */
-.stDataFrame { border-radius: 10px; overflow: hidden; }
-
-/* Buttons */
-.stButton > button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 0.5rem 1.5rem;
-    font-weight: 600;
-    transition: all 0.3s;
+.main-header p{
+    margin-top:10px;
+    opacity:.9;
 }
-.stButton > button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+
+/* Card Statistik */
+.stat-card{
+
+    background:rgba(255,255,255,.75);
+
+    backdrop-filter:blur(20px);
+
+    border-radius:20px;
+
+    padding:20px;
+
+    border:1px solid rgba(255,255,255,.4);
+
+    box-shadow:
+    0 8px 32px rgba(31,38,135,.12);
+
+    transition:.3s;
+}
+
+.stat-card:hover{
+    transform:
+    translateY(-8px)
+    scale(1.02);
+
+    box-shadow:
+    0 15px 40px rgba(99,102,241,.25);
+}
+
+.stat-card .icon{
+    font-size:2.5rem;
+    float:right;
+    opacity:.25;
+}
+
+.stat-card h3{
+    color:#6b7280;
+    font-size:.8rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.stat-card .value{
+    font-size:2rem;
+    font-weight:700;
+    color:#111827;
+}
+
+/* Variasi Card */
+.green{
+    border-left:5px solid #10b981;
+}
+
+.orange{
+    border-left:5px solid #f59e0b;
+}
+
+.red{
+    border-left:5px solid #ef4444;
+}
+
+.purple{
+    border-left:5px solid #8b5cf6;
+}
+
+/* Dataframe */
+[data-testid="stDataFrame"]{
+    border-radius:20px;
+    overflow:hidden;
+    border:none;
+    box-shadow:
+    0 10px 30px rgba(0,0,0,.08);
+}
+
+/* Input */
+.stTextInput input,
+.stNumberInput input,
+.stTextArea textarea,
+.stSelectbox{
+    border-radius:15px !important;
+}
+
+/* Form */
+[data-testid="stForm"]{
+    background:white;
+    border-radius:20px;
+    padding:20px;
+    box-shadow:
+    0 10px 30px rgba(0,0,0,.06);
+}
+
+/* Button */
+.stButton > button{
+
+    background:
+    linear-gradient(
+        135deg,
+        #6366f1,
+        #8b5cf6
+    );
+
+    color:white;
+
+    border:none;
+
+    border-radius:15px;
+
+    font-weight:600;
+
+    transition:.3s;
+
+    height:48px;
+}
+
+.stButton > button:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+    0 10px 25px rgba(99,102,241,.4);
+}
+
+/* Tabs */
+.stTabs [role="tab"]{
+    border-radius:12px;
+    padding:10px 18px;
+    font-weight:600;
+}
+
+.stTabs [aria-selected="true"]{
+    background:#6366f1 !important;
+    color:white !important;
+}
+
+/* Metric */
+[data-testid="metric-container"]{
+    background:white;
+    border-radius:18px;
+    padding:15px;
+    box-shadow:
+    0 10px 25px rgba(0,0,0,.06);
 }
 
 /* Login Box */
-.login-box {
-    max-width: 450px;
-    margin: 5rem auto;
-    padding: 3rem;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-}
-.login-logo {
-    text-align: center;
-    font-size: 4rem;
-    margin-bottom: 1rem;
+.login-box{
+    background:rgba(255,255,255,.85);
+
+    backdrop-filter:blur(20px);
+
+    border-radius:25px;
+
+    box-shadow:
+    0 20px 60px rgba(0,0,0,.1);
+
+    padding:40px;
 }
 
-/* Badge */
-.badge {
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    display: inline-block;
+.login-logo{
+    font-size:5rem;
+    text-align:center;
 }
-.badge-success { background: #d1fae5; color: #065f46; }
-.badge-warning { background: #fef3c7; color: #92400e; }
-.badge-danger { background: #fee2e2; color: #991b1b; }
-.badge-info { background: #dbeafe; color: #1e40af; }
 
-/* Hide default Streamlit elements */
-#MainMenu, header, footer { visibility: hidden; }
+/* Scrollbar */
+::-webkit-scrollbar{
+    width:10px;
+}
+
+::-webkit-scrollbar-track{
+    background:#f3f4f6;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#8b5cf6;
+    border-radius:10px;
+}
+
+/* Hide Streamlit */
+#MainMenu,
+header,
+footer{
+    visibility:hidden;
+}
+
 </style>
 """
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
