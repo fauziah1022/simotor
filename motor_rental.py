@@ -72,10 +72,14 @@ h1, h2, h3, h4 {
     backdrop-filter: blur(18px);
     border-right: 1px solid rgba(255,255,255,0.08);
 }
-[data-testid="stSidebar"] .stMarkdown { color: #E6E8F5; }
+[data-testid="stSidebar"] .stMarkdown,
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] div,
+[data-testid="stSidebar"] label { color: #FFFFFF !important; }
 [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2,
 [data-testid="stSidebar"] h3 { color: white !important; font-family: 'Manrope', sans-serif !important; }
-[data-testid="stSidebar"] hr { border-color: rgba(255,255,255,0.12); }
+[data-testid="stSidebar"] hr { border-color: rgba(255,255,255,0.18); }
 
 /* Radio nav styled as glass pill list */
 [data-testid="stSidebar"] [role="radiogroup"] label {
@@ -85,7 +89,7 @@ h1, h2, h3, h4 {
     padding: 0.6rem 0.9rem;
     margin-bottom: 0.4rem;
     transition: all 0.2s ease;
-    color: #CBD2EE !important;
+    color: #FFFFFF !important;
 }
 [data-testid="stSidebar"] [role="radiogroup"] label:hover {
     background: rgba(255,255,255,0.12);
@@ -1093,7 +1097,7 @@ def main():
         <div style="text-align:center; padding:1.2rem 0 0.6rem;">
             <div style="font-size:2.6rem;">🏍️</div>
             <h2 style="color:white; margin:0; font-size:1.3rem;">SIMOTOR</h2>
-            <p style="color:#A9B0D4; font-size:0.82rem; margin-top:0.2rem;">Rental Motor Asoka</p>
+            <p style="color:#FFFFFF; opacity:0.85; font-size:0.82rem; margin-top:0.2rem;">Rental Motor Asoka</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1101,9 +1105,9 @@ def main():
         st.markdown(f"""
         <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
                     border-radius:12px; padding:0.8rem 1rem; margin-bottom:0.8rem;">
-            <div style="color:#fff; font-weight:700; font-size:0.95rem;">👤 {st.session_state.user['username']}</div>
-            <div style="color:#A9B0D4; font-size:0.8rem; margin-top:0.25rem;">🏷️ {st.session_state.user['role'].capitalize()}</div>
-            <div style="color:#A9B0D4; font-size:0.8rem;">🏢 {st.session_state.user['cabang']}</div>
+            <div style="color:#FFFFFF; font-weight:700; font-size:0.95rem;">👤 {st.session_state.user['username']}</div>
+            <div style="color:#FFFFFF; opacity:0.85; font-size:0.8rem; margin-top:0.25rem;">🏷️ {st.session_state.user['role'].capitalize()}</div>
+            <div style="color:#FFFFFF; opacity:0.85; font-size:0.8rem;">🏢 {st.session_state.user['cabang']}</div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown("---")
@@ -1130,7 +1134,7 @@ def main():
             st.rerun()
 
         st.markdown("""
-        <div style="position:fixed; bottom:18px; left:24px; color:#7C84B5; font-size:0.72rem;">
+        <div style="position:fixed; bottom:18px; left:24px; color:#FFFFFF; opacity:0.6; font-size:0.72rem;">
             SIMOTOR v2.0<br>© 2024 Asoka Rental
         </div>
         """, unsafe_allow_html=True)
