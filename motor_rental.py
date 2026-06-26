@@ -14,257 +14,293 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ============ CUSTOM CSS + HTML ============
+# ============ DESIGN SYSTEM ============
+# Token summary (kept here as the single source of truth for the palette):
+#   Ink/base   #0B1220   -- dark glass base behind frosted panels
+#   App bg     #F3F5FC -> #EAF1FB  -- soft indigo-tinted mesh, not flat white
+#   Violet     #6D5EF5   -- primary brand / gradient start
+#   Cyan       #22D3EE   -- "tersedia" / online / gradient end
+#   Amber      #F59E0B   -- "disewa" / in-progress
+#   Rose       #FB7185   -- "rusak" / danger
+#   Slate      #64748B   -- "servis" / neutral / muted text
+# Display type: Manrope (headers) -- geometric, dashboard-confident
+# Body type:    Inter (text, tables)
+# Mono type:    JetBrains Mono (plate numbers, currency, ids) -- the
+#               signature touch: every motor status renders as a small
+#               license-plate-style chip in mono type, tying the badge
+#               system back to this being a real rental counter, not a
+#               generic SaaS dot-badge.
 CUSTOM_CSS = """
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+:root {
+    --ink: #0B1220;
+    --violet: #6D5EF5;
+    --violet-soft: #8B7FF8;
+    --cyan: #22D3EE;
+    --amber: #F59E0B;
+    --rose: #FB7185;
+    --slate: #64748B;
+    --glass-bg: rgba(255,255,255,0.55);
+    --glass-border: rgba(255,255,255,0.65);
+    --glass-shadow: 0 8px 32px rgba(31,41,82,0.10);
+}
 
 html, body, [class*="css"] {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
-/* Background Utama */
+/* ---------- App background: soft gradient mesh, not flat white ---------- */
 .stApp {
     background:
-    linear-gradient(
-        135deg,
-        #eef2ff 0%,
-        #fdf4ff 50%,
-        #ecfeff 100%
-    );
+        radial-gradient(circle at 8% 8%, rgba(109,94,245,0.10) 0%, transparent 45%),
+        radial-gradient(circle at 95% 18%, rgba(34,211,238,0.12) 0%, transparent 40%),
+        radial-gradient(circle at 50% 100%, rgba(245,158,11,0.06) 0%, transparent 50%),
+        linear-gradient(180deg, #F3F5FC 0%, #EAF1FB 100%);
+    background-attachment: fixed;
 }
 
-/* Sidebar */
-[data-testid="stSidebar"]{
-    background:
-    linear-gradient(
-        180deg,
-        #312e81,
-        #4338ca,
-        #6366f1
-    );
-    border-right:1px solid rgba(255,255,255,0.1);
+h1, h2, h3, h4 {
+    font-family: 'Manrope', sans-serif !important;
+    letter-spacing: -0.01em;
 }
 
-[data-testid="stSidebar"] *{
-    color:white !important;
+/* ---------- Sidebar: frosted glass rail floating over the mesh ---------- */
+[data-testid="stSidebar"] {
+    background: linear-gradient(165deg, rgba(13,17,38,0.92) 0%, rgba(30,22,74,0.92) 55%, rgba(15,23,42,0.94) 100%);
+    backdrop-filter: blur(18px);
+    border-right: 1px solid rgba(255,255,255,0.08);
+}
+[data-testid="stSidebar"] .stMarkdown { color: #E6E8F5; }
+[data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 { color: white !important; font-family: 'Manrope', sans-serif !important; }
+[data-testid="stSidebar"] hr { border-color: rgba(255,255,255,0.12); }
+
+/* Radio nav styled as glass pill list */
+[data-testid="stSidebar"] [role="radiogroup"] label {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 0.6rem 0.9rem;
+    margin-bottom: 0.4rem;
+    transition: all 0.2s ease;
+    color: #CBD2EE !important;
+}
+[data-testid="stSidebar"] [role="radiogroup"] label:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.18);
 }
 
-/* Header */
-.main-header{
-    background:
-    linear-gradient(
-        135deg,
-        rgba(99,102,241,.95),
-        rgba(168,85,247,.95)
-    );
+/* ---------- Header banner ---------- */
+.main-header {
+    position: relative;
+    background: linear-gradient(120deg, #6D5EF5 0%, #8B7FF8 45%, #22D3EE 100%);
+    padding: 2.1rem 2.4rem;
+    border-radius: 22px;
+    color: white;
+    margin-bottom: 1.8rem;
+    box-shadow: 0 16px 40px rgba(109,94,245,0.28);
+    overflow: hidden;
+}
+.main-header::after {
+    content: "";
+    position: absolute;
+    top: -40%; right: -10%;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%);
+    pointer-events: none;
+}
+.main-header h1 {
+    margin: 0; font-weight: 800; font-size: 1.7rem;
+    font-family: 'Manrope', sans-serif;
+}
+.main-header p { margin: 0.4rem 0 0 0; opacity: 0.92; font-size: 0.95rem; }
+.main-header .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    display: block;
+    margin-bottom: 0.3rem;
+}
 
+/* ---------- Glass panels (wrap dataframes / sections) ---------- */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 1.4rem 1.5rem;
+    box-shadow: var(--glass-shadow);
+    margin-bottom: 1.2rem;
+}
+.glass-panel h3, .glass-panel .panel-title {
+    margin-top: 0;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    font-size: 1.02rem;
+    color: #1E2245;
+}
+
+/* ---------- Stat Cards: glass tiles with a glow underneath ---------- */
+.stat-card {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    padding: 1.3rem 1.4rem;
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+}
+.stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--violet), var(--cyan));
+    opacity: 0.9;
+}
+.stat-card.green::before  { background: linear-gradient(90deg, #10b981, var(--cyan)); }
+.stat-card.orange::before { background: linear-gradient(90deg, var(--amber), #fbbf24); }
+.stat-card.red::before    { background: linear-gradient(90deg, var(--rose), #f43f5e); }
+.stat-card.purple::before { background: linear-gradient(90deg, var(--violet), var(--violet-soft)); }
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(109,94,245,0.18);
+}
+.stat-card h3 {
+    font-size: 0.74rem; color: var(--slate); margin: 0;
+    text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+    font-family: 'Inter', sans-serif !important;
+}
+.stat-card .value {
+    font-size: 1.9rem; font-weight: 800; color: #11142B; margin: 0.4rem 0 0 0;
+    font-family: 'Manrope', sans-serif;
+}
+.stat-card .icon {
+    font-size: 1.7rem; float: right; opacity: 0.45;
+    filter: drop-shadow(0 4px 8px rgba(109,94,245,0.25));
+}
+
+/* ---------- License-plate-style status chip (signature element) ---------- */
+.plate-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    padding: 0.28rem 0.7rem;
+    border-radius: 7px;
+    border: 1.5px solid currentColor;
+    text-transform: uppercase;
+}
+.plate-chip::before { content: "●"; font-size: 0.6rem; }
+.plate-tersedia { color: #0F9D6B; background: rgba(16,185,129,0.10); }
+.plate-disewa   { color: #B45309; background: rgba(245,158,11,0.12); }
+.plate-rusak    { color: #BE123C; background: rgba(251,113,133,0.14); }
+.plate-servis   { color: #475569; background: rgba(100,116,139,0.12); }
+.plate-aktif    { color: #6D5EF5; background: rgba(109,94,245,0.10); }
+.plate-selesai  { color: #0F9D6B; background: rgba(16,185,129,0.10); }
+
+/* ---------- Table Styling ---------- */
+.stDataFrame { border-radius: 14px; overflow: hidden; }
+[data-testid="stDataFrame"] {
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(31,41,82,0.06);
+}
+
+/* ---------- Buttons ---------- */
+.stButton > button {
+    background: linear-gradient(120deg, #6D5EF5 0%, #8B7FF8 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.55rem 1.5rem;
+    font-weight: 700;
+    font-family: 'Manrope', sans-serif;
+    box-shadow: 0 6px 18px rgba(109,94,245,0.28);
+    transition: all 0.22s ease;
+}
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(109,94,245,0.38);
+}
+.stButton > button:active { transform: translateY(0); }
+
+/* ---------- Login Box ---------- */
+.login-shell {
+    max-width: 460px;
+    margin: 4rem auto 0;
+    padding: 2.6rem 2.8rem;
+    background: rgba(255,255,255,0.6);
     backdrop-filter: blur(20px);
-
-    padding:2rem;
-    border-radius:25px;
-
-    color:white;
-
-    box-shadow:
-    0 20px 40px rgba(99,102,241,.25);
-
-    margin-bottom:25px;
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 24px;
+    box-shadow: 0 24px 64px rgba(31,41,82,0.16);
+}
+.login-logo-wrap {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #6D5EF5, #22D3EE);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    margin: 0 auto 1rem;
+    box-shadow: 0 10px 26px rgba(109,94,245,0.35);
+}
+.login-shell h2 {
+    text-align: center; color: #181B3A; margin: 0;
+    font-family: 'Manrope', sans-serif; font-weight: 800;
+}
+.login-shell .sub {
+    text-align: center; color: var(--slate); margin: 0.3rem 0 1.6rem 0; font-size: 0.92rem;
 }
 
-.main-header h1{
-    margin:0;
-    font-weight:700;
+/* Demo credential pills inside the info box */
+.demo-pill {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    background: rgba(109,94,245,0.08);
+    color: #4A3FCB;
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    margin: 0 0.15rem;
 }
 
-.main-header p{
-    margin-top:10px;
-    opacity:.9;
+/* ---------- Receipt / struk ---------- */
+.struk-card {
+    background: linear-gradient(160deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6));
+    backdrop-filter: blur(14px);
+    padding: 1.6rem 1.8rem;
+    border-radius: 18px;
+    margin-top: 1.2rem;
+    border: 1.5px dashed rgba(109,94,245,0.4);
+    box-shadow: 0 12px 30px rgba(31,41,82,0.10);
+}
+.struk-card h3 { text-align: center; font-family: 'Manrope', sans-serif; color: #1E2245; }
+.struk-card hr { border-color: rgba(109,94,245,0.2); }
+.struk-card .struk-total {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: #181B3A;
 }
 
-/* Card Statistik */
-.stat-card{
-
-    background:rgba(255,255,255,.75);
-
-    backdrop-filter:blur(20px);
-
-    border-radius:20px;
-
-    padding:20px;
-
-    border:1px solid rgba(255,255,255,.4);
-
-    box-shadow:
-    0 8px 32px rgba(31,38,135,.12);
-
-    transition:.3s;
+/* ---------- Section dividers ---------- */
+.section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(109,94,245,0.25), transparent);
+    margin: 1.6rem 0;
+    border: none;
 }
 
-.stat-card:hover{
-    transform:
-    translateY(-8px)
-    scale(1.02);
-
-    box-shadow:
-    0 15px 40px rgba(99,102,241,.25);
-}
-
-.stat-card .icon{
-    font-size:2.5rem;
-    float:right;
-    opacity:.25;
-}
-
-.stat-card h3{
-    color:#6b7280;
-    font-size:.8rem;
-    text-transform:uppercase;
-    letter-spacing:1px;
-}
-
-.stat-card .value{
-    font-size:2rem;
-    font-weight:700;
-    color:#111827;
-}
-
-/* Variasi Card */
-.green{
-    border-left:5px solid #10b981;
-}
-
-.orange{
-    border-left:5px solid #f59e0b;
-}
-
-.red{
-    border-left:5px solid #ef4444;
-}
-
-.purple{
-    border-left:5px solid #8b5cf6;
-}
-
-/* Dataframe */
-[data-testid="stDataFrame"]{
-    border-radius:20px;
-    overflow:hidden;
-    border:none;
-    box-shadow:
-    0 10px 30px rgba(0,0,0,.08);
-}
-
-/* Input */
-.stTextInput input,
-.stNumberInput input,
-.stTextArea textarea,
-.stSelectbox{
-    border-radius:15px !important;
-}
-
-/* Form */
-[data-testid="stForm"]{
-    background:white;
-    border-radius:20px;
-    padding:20px;
-    box-shadow:
-    0 10px 30px rgba(0,0,0,.06);
-}
-
-/* Button */
-.stButton > button{
-
-    background:
-    linear-gradient(
-        135deg,
-        #6366f1,
-        #8b5cf6
-    );
-
-    color:white;
-
-    border:none;
-
-    border-radius:15px;
-
-    font-weight:600;
-
-    transition:.3s;
-
-    height:48px;
-}
-
-.stButton > button:hover{
-
-    transform:translateY(-3px);
-
-    box-shadow:
-    0 10px 25px rgba(99,102,241,.4);
-}
-
-/* Tabs */
-.stTabs [role="tab"]{
-    border-radius:12px;
-    padding:10px 18px;
-    font-weight:600;
-}
-
-.stTabs [aria-selected="true"]{
-    background:#6366f1 !important;
-    color:white !important;
-}
-
-/* Metric */
-[data-testid="metric-container"]{
-    background:white;
-    border-radius:18px;
-    padding:15px;
-    box-shadow:
-    0 10px 25px rgba(0,0,0,.06);
-}
-
-/* Login Box */
-.login-box{
-    background:rgba(255,255,255,.85);
-
-    backdrop-filter:blur(20px);
-
-    border-radius:25px;
-
-    box-shadow:
-    0 20px 60px rgba(0,0,0,.1);
-
-    padding:40px;
-}
-
-.login-logo{
-    font-size:5rem;
-    text-align:center;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar{
-    width:10px;
-}
-
-::-webkit-scrollbar-track{
-    background:#f3f4f6;
-}
-
-::-webkit-scrollbar-thumb{
-    background:#8b5cf6;
-    border-radius:10px;
-}
-
-/* Hide Streamlit */
-#MainMenu,
-header,
-footer{
-    visibility:hidden;
-}
-
+/* Hide default Streamlit elements */
+#MainMenu, header, footer { visibility: hidden; }
 </style>
 """
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
@@ -278,14 +314,6 @@ if 'user' not in st.session_state:
 db.init_db()
 
 # ============ HELPER FUNCTIONS ============
-def show_toast(msg, type="success"):
-    if type == "success":
-        st.success(msg)
-    elif type == "error":
-        st.error(msg)
-    elif type == "info":
-        st.info(msg)
-
 def format_rp(num):
     return f"Rp {int(num):,}".replace(",", ".")
 
@@ -301,23 +329,57 @@ def get_df(query, params=None):
         conn.close()
     return df
 
-# ============ LOGIN PAGE ============
-def login_page():
-    st.markdown("""
-    <div class="login-box">
-        <div class="login-logo">🏍️</div>
-        <h2 style="text-align:center; color:#1e3a8a;">SIMOTOR</h2>
-        <p style="text-align:center; color:#6b7280;">Sistem Rental Motor Asoka Terdistribusi</p>
+def plate_chip(status):
+    """Render the signature license-plate-style status chip."""
+    status_key = str(status).lower().strip()
+    label_map = {
+        'tersedia': 'Tersedia', 'disewa': 'Disewa', 'rusak': 'Rusak',
+        'servis': 'Servis', 'aktif': 'Aktif', 'selesai': 'Selesai',
+    }
+    label = label_map.get(status_key, status)
+    css_class = f"plate-{status_key}" if status_key in label_map else "plate-servis"
+    return f'<span class="plate-chip {css_class}">{label}</span>'
+
+def section_header(eyebrow, title, subtitle):
+    st.markdown(f"""
+    <div class="main-header">
+        <span class="eyebrow">{eyebrow}</span>
+        <h1>{title}</h1>
+        <p>{subtitle}</p>
     </div>
     """, unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([1, 2, 1])
+
+def glass_open(title=None):
+    title_html = f'<div class="panel-title">{title}</div>' if title else ""
+    st.markdown(f'<div class="glass-panel">{title_html}', unsafe_allow_html=True)
+
+def glass_close():
+    st.markdown('</div>', unsafe_allow_html=True)
+
+PLOTLY_LAYOUT = dict(
+    plot_bgcolor='rgba(0,0,0,0)',
+    paper_bgcolor='rgba(0,0,0,0)',
+    font=dict(family="Inter, sans-serif", color="#3A3F5C"),
+    margin=dict(t=20, l=10, r=10, b=10),
+)
+
+# ============ LOGIN PAGE ============
+def login_page():
+    col1, col2, col3 = st.columns([1, 1.3, 1])
     with col2:
+        st.markdown("""
+        <div class="login-shell">
+            <div class="login-logo-wrap">🏍️</div>
+            <h2>SIMOTOR</h2>
+            <p class="sub">Sistem Rental Motor Asoka &middot; Terdistribusi</p>
+        </div>
+        """, unsafe_allow_html=True)
+
         with st.form("login_form"):
-            username = st.text_input("👤 Username")
-            password = st.text_input("🔒 Password", type="password")
-            submitted = st.form_submit_button("🚀 Login", use_container_width=True)
-            
+            username = st.text_input("Username", placeholder="cth. admin")
+            password = st.text_input("Password", type="password", placeholder="••••••••")
+            submitted = st.form_submit_button("Masuk ke Dashboard →", use_container_width=True)
+
             if submitted:
                 user = db.verify_login(username, password)
                 if user:
@@ -325,23 +387,19 @@ def login_page():
                     st.session_state.user = user
                     st.rerun()
                 else:
-                    st.error("❌ Username atau password salah!")
-        
-        st.info("""
-        **Demo Login:**
-        - Admin: `admin` / `admin123`
-        - Petugas: `petugas1` / `petugas123`
-        """)
+                    st.error("Username atau password salah. Coba lagi.")
+
+        st.markdown("""
+        <div style="text-align:center; margin-top:0.8rem; color:#64748B; font-size:0.85rem;">
+            Demo &middot; Admin <span class="demo-pill">admin / admin123</span><br>
+            Petugas <span class="demo-pill">petugas1 / petugas123</span>
+        </div>
+        """, unsafe_allow_html=True)
 
 # ============ DASHBOARD PAGE ============
 def dashboard_page():
-    st.markdown("""
-    <div class="main-header">
-        <h1>📊 Dashboard</h1>
-        <p>Ringkasan operasional rental motor hari ini</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
+    section_header("Ringkasan Operasional", "📊 Dashboard", "Pantau performa rental hari ini secara langsung")
+
     # Stats
     today = datetime.now().strftime('%Y-%m-%d')
     trx_hari_ini = get_df("SELECT COUNT(*) c FROM transaksi WHERE tgl_sewa=?", (today,)).iloc[0]['c']
@@ -349,7 +407,7 @@ def dashboard_page():
     motor_disewa = get_df("SELECT COUNT(*) c FROM motor WHERE status='disewa'").iloc[0]['c']
     pendapatan = get_df("SELECT COALESCE(SUM(total_bayar),0) t FROM pengembalian").iloc[0]['t']
     total_pelanggan = get_df("SELECT COUNT(*) c FROM pelanggan").iloc[0]['c']
-    
+
     c1, c2, c3, c4, c5 = st.columns(5)
     with c1:
         st.markdown(f"""<div class="stat-card">
@@ -373,7 +431,7 @@ def dashboard_page():
         st.markdown(f"""<div class="stat-card purple">
             <span class="icon">💰</span>
             <h3>Total Pendapatan</h3>
-            <div class="value" style="font-size:1.3rem;">{format_rp(pendapatan)}</div>
+            <div class="value" style="font-size:1.25rem;">{format_rp(pendapatan)}</div>
         </div>""", unsafe_allow_html=True)
     with c5:
         st.markdown(f"""<div class="stat-card red">
@@ -381,14 +439,14 @@ def dashboard_page():
             <h3>Total Pelanggan</h3>
             <div class="value">{total_pelanggan}</div>
         </div>""", unsafe_allow_html=True)
-    
-    st.markdown("---")
-    
+
+    st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
+
     # Charts
     col1, col2 = st.columns(2)
-    
+
     with col1:
-        st.subheader("📈 Transaksi 7 Hari Terakhir")
+        glass_open("📈 Transaksi 7 Hari Terakhir")
         df_trx = get_df("""
             SELECT tgl_sewa, COUNT(*) as jumlah 
             FROM transaksi 
@@ -400,24 +458,26 @@ def dashboard_page():
         else:
             fig = px.line(df_trx, x='tgl_sewa', y='jumlah', markers=True,
                           labels={'tgl_sewa':'Tanggal','jumlah':'Jumlah Transaksi'})
-            fig.update_traces(line=dict(color='#667eea', width=3))
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', height=350)
+            fig.update_traces(line=dict(color='#6D5EF5', width=3), marker=dict(size=7, color='#22D3EE'))
+            fig.update_layout(height=320, **PLOTLY_LAYOUT)
             st.plotly_chart(fig, use_container_width=True)
-    
+        glass_close()
+
     with col2:
-        st.subheader("🏍️ Status Motor")
+        glass_open("🏍️ Status Motor")
         df_status = get_df("SELECT status, COUNT(*) as jumlah FROM motor GROUP BY status")
         if df_status.empty:
             st.info("Belum ada data motor.")
         else:
-            colors = {'tersedia':'#10b981','disewa':'#f59e0b','rusak':'#ef4444','servis':'#6b7280'}
+            colors = {'tersedia':'#10b981','disewa':'#f59e0b','rusak':'#fb7185','servis':'#64748b'}
             fig = px.pie(df_status, values='jumlah', names='status',
-                         color='status', color_discrete_map=colors, hole=0.5)
-            fig.update_layout(height=350)
+                         color='status', color_discrete_map=colors, hole=0.6)
+            fig.update_layout(height=320, **PLOTLY_LAYOUT)
             st.plotly_chart(fig, use_container_width=True)
-    
+        glass_close()
+
     # Pendapatan 30 hari
-    st.subheader("💵 Pendapatan 30 Hari Terakhir")
+    glass_open("💵 Pendapatan 30 Hari Terakhir")
     df_pendapatan = get_df("""
         SELECT tgl_kembali as tanggal, SUM(total_bayar) as pendapatan
         FROM pengembalian
@@ -429,12 +489,13 @@ def dashboard_page():
     else:
         fig = px.area(df_pendapatan, x='tanggal', y='pendapatan',
                       labels={'tanggal':'Tanggal','pendapatan':'Pendapatan (Rp)'})
-        fig.update_traces(fillcolor='rgba(102,126,234,0.3)', line=dict(color='#667eea', width=2))
-        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', height=350)
+        fig.update_traces(fillcolor='rgba(109,94,245,0.22)', line=dict(color='#6D5EF5', width=2.5))
+        fig.update_layout(height=320, **PLOTLY_LAYOUT)
         st.plotly_chart(fig, use_container_width=True)
-    
+    glass_close()
+
     # Transaksi terbaru
-    st.subheader("📝 Transaksi Terbaru")
+    glass_open("📝 Transaksi Terbaru")
     df_recent = get_df("""
         SELECT t.id, p.nama, m.nopol, m.merek, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya, t.status
         FROM transaksi t
@@ -447,26 +508,23 @@ def dashboard_page():
     else:
         df_recent['total_biaya'] = df_recent['total_biaya'].apply(format_rp)
         st.dataframe(df_recent, use_container_width=True, hide_index=True)
+    glass_close()
 
 # ============ MOTOR PAGE ============
 def motor_page():
-    st.markdown("""
-    <div class="main-header">
-        <h1>🏍️ Manajemen Motor</h1>
-        <p>Kelola data armada motor rental</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
+    section_header("Armada", "🏍️ Manajemen Motor", "Kelola data, status, dan foto armada motor rental")
+
+    glass_open()
     col1, col2 = st.columns([2, 1])
     with col1:
         search = st.text_input("🔍 Cari motor (nopol/merek)")
     with col2:
         filter_status = st.selectbox("Filter Status", ["semua","tersedia","disewa","rusak","servis"])
-    
+    glass_close()
+
     # Build query with parameter placeholders instead of string-formatting
-    # user input directly into SQL (the old version was vulnerable to SQL
-    # injection and would also crash on values containing a single quote,
-    # e.g. searching for a customer/motor name with an apostrophe).
+    # user input directly into SQL (prevents SQL injection and avoids
+    # crashing on values containing a single quote, e.g. an apostrophe).
     query = "SELECT * FROM motor WHERE 1=1"
     params = []
     if search:
@@ -476,13 +534,14 @@ def motor_page():
     if filter_status != "semua":
         query += " AND status = ?"
         params.append(filter_status)
-    
+
     df = get_df(query, tuple(params) if params else None)
-    
+
     if st.button("➕ Tambah Motor Baru"):
         st.session_state.show_motor_form = True
-    
+
     if st.session_state.get('show_motor_form'):
+        glass_open("Tambah Motor Baru")
         with st.form("motor_form"):
             c1, c2 = st.columns(2)
             with c1:
@@ -501,7 +560,7 @@ def motor_page():
                 keterangan = st.text_area(
                     "📝 Keterangan Motor"
                 )
-            
+
             col_a, col_b = st.columns(2)
             with col_a:
                 if st.form_submit_button("💾 Simpan", use_container_width=True):
@@ -540,20 +599,33 @@ def motor_page():
                 if st.form_submit_button("❌ Batal", use_container_width=True):
                     st.session_state.show_motor_form = False
                     st.rerun()
-    
+        glass_close()
+
     # Display table with status badge
     if not df.empty:
+        glass_open(f"Daftar Motor ({len(df)})")
+        df_display = df[['nopol','merek','jenis','tarif_jam','tarif_hari','status']].copy()
+        df_display['tarif_jam'] = df_display['tarif_jam'].apply(format_rp)
+        df_display['tarif_hari'] = df_display['tarif_hari'].apply(format_rp)
+        df_display['status'] = df_display['status'].apply(lambda s: s.upper())
         st.dataframe(
-            df[['nopol','merek','jenis','tarif_jam','tarif_hari','status']],
-            use_container_width=True, hide_index=True
+            df_display,
+            use_container_width=True, hide_index=True,
+            column_config={
+                "nopol": "Nopol", "merek": "Merek", "jenis": "Jenis",
+                "tarif_jam": "Tarif/Jam", "tarif_hari": "Tarif/Hari", "status": "Status",
+            }
         )
-        
+        glass_close()
+
         # Edit/Delete
-        st.markdown("### ✏️ Edit / Hapus Motor")
+        glass_open("✏️ Edit / Hapus Motor")
         selected = st.selectbox("Pilih Motor", df['nopol'].tolist())
         if selected:
             motor = df[df['nopol']==selected].iloc[0]
-            
+            st.markdown(plate_chip(motor['status']), unsafe_allow_html=True)
+            st.write("")
+
             if 'foto' in motor.index and motor['foto'] is not None:
                 st.image(
                     bytes(motor['foto']),
@@ -624,21 +696,18 @@ def motor_page():
                         st.error(f"Error: {e}")
                     finally:
                         conn.close()
+        glass_close()
     else:
         st.info("Tidak ada data motor yang cocok.")
 
 # ============ PELANGGAN PAGE ============
 def pelanggan_page():
-    st.markdown("""
-    <div class="main-header">
-        <h1>👥 Manajemen Pelanggan</h1>
-        <p>Kelola data pelanggan rental</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
+    section_header("Database", "👥 Manajemen Pelanggan", "Kelola data pelanggan rental")
+
     tab1, tab2 = st.tabs(["📋 Daftar Pelanggan", "➕ Tambah Pelanggan"])
-    
+
     with tab1:
+        glass_open()
         search = st.text_input("🔍 Cari pelanggan")
         if search:
             like = f"%{search}%"
@@ -649,8 +718,10 @@ def pelanggan_page():
             st.dataframe(df, use_container_width=True, hide_index=True)
         else:
             st.info("Belum ada data pelanggan")
-    
+        glass_close()
+
     with tab2:
+        glass_open()
         with st.form("pel_form"):
             c1, c2 = st.columns(2)
             with c1:
@@ -659,7 +730,7 @@ def pelanggan_page():
             with c2:
                 telepon = st.text_input("Nomor Telepon")
                 alamat = st.text_area("Alamat")
-            
+
             if st.form_submit_button("💾 Simpan Pelanggan"):
                 if nama and ktp:
                     conn = db.get_connection()
@@ -675,35 +746,28 @@ def pelanggan_page():
                         conn.close()
                 else:
                     st.error("Nama dan KTP wajib diisi!")
+        glass_close()
 
 # ============ TRANSAKSI PAGE ============
 def transaksi_page():
-    st.markdown("""
-    <div class="main-header">
-        <h1>🧾 Transaksi Penyewaan</h1>
-        <p>Buat transaksi sewa motor baru</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
+    section_header("Operasional", "🧾 Transaksi Penyewaan", "Buat transaksi sewa motor baru")
+
     tab1, tab2, tab3 = st.tabs(["➕ Sewa Baru", "🔄 Pengembalian", "📋 Riwayat"])
-    
+
     with tab1:
         pel_list = get_df("SELECT id, nama, ktp FROM pelanggan")
         motor_list = get_df("SELECT id, nopol, merek, tarif_jam, tarif_hari FROM motor WHERE status='tersedia'")
-        
+
         if pel_list.empty or motor_list.empty:
             st.warning("Data pelanggan atau motor tersedia kosong!")
             return
-        
+
+        glass_open()
         with st.form("trx_form"):
             c1, c2 = st.columns(2)
             with c1:
                 # Use format_func so the selectbox displays a friendly label
                 # while keeping the underlying value as the actual row id.
-                # The old version matched on the rendered string itself,
-                # which breaks (picks the wrong row, or crashes with an
-                # IndexError) whenever two customers/motors render the same
-                # display text.
                 pel_choice_id = st.selectbox(
                     "Pilih Pelanggan",
                     pel_list['id'].tolist(),
@@ -727,11 +791,11 @@ def transaksi_page():
             with c2:
                 durasi = st.number_input("Durasi", min_value=1, value=1)
                 satuan = st.selectbox("Satuan", ["hari","jam"])
-                
+
                 tarif = motor_row['tarif_hari'] if satuan == 'hari' else motor_row['tarif_jam']
                 total = tarif * durasi
                 st.metric("💰 Total Biaya", format_rp(total))
-            
+
             if st.form_submit_button("✅ Simpan Transaksi"):
                 conn = db.get_connection()
                 try:
@@ -742,17 +806,17 @@ def transaksi_page():
                     conn.execute("UPDATE motor SET status='disewa' WHERE id=?", (int(motor_row['id']),))
                     conn.commit()
                     st.success("✅ Transaksi berhasil disimpan!")
-                    
+
                     # Struk
                     st.markdown(f"""
-                    <div style="background:#f9fafb; padding:20px; border-radius:10px; margin-top:20px; border:2px dashed #667eea;">
-                        <h3 style="text-align:center;">🧾 STRUK SEWA MOTOR</h3>
+                    <div class="struk-card">
+                        <h3>🧾 STRUK SEWA MOTOR</h3>
                         <hr>
                         <p><b>Tanggal:</b> {datetime.now().strftime('%d-%m-%Y %H:%M')}</p>
                         <p><b>Motor:</b> {motor_sel}</p>
                         <p><b>Durasi:</b> {durasi} {satuan}</p>
-                        <p><b>Total:</b> {format_rp(total)}</p>
-                        <p style="text-align:center; margin-top:20px;"><i>Terima kasih telah menggunakan layanan kami!</i></p>
+                        <p class="struk-total"><b>Total:</b> {format_rp(total)}</p>
+                        <p style="text-align:center; margin-top:18px; color:#64748B;"><i>Terima kasih telah menggunakan layanan kami!</i></p>
                     </div>
                     """, unsafe_allow_html=True)
                 except Exception as e:
@@ -760,7 +824,8 @@ def transaksi_page():
                 finally:
                     conn.close()
                 st.rerun()
-    
+        glass_close()
+
     with tab2:
         trx_aktif = get_df("""
             SELECT
@@ -781,23 +846,24 @@ def transaksi_page():
         if trx_aktif.empty:
             st.info("Tidak ada transaksi aktif")
         else:
+            glass_open(f"Transaksi Aktif ({len(trx_aktif)})")
             st.dataframe(trx_aktif, use_container_width=True, hide_index=True)
             selected = st.selectbox("Pilih Transaksi untuk Dikembalikan", trx_aktif['id'].tolist())
             tgl_kembali = st.date_input("Tanggal Kembali", datetime.now())
-            
+
             if st.button("🔄 Proses Pengembalian"):
                 trx = trx_aktif[trx_aktif['id']==selected].iloc[0]
                 tgl_sewa = datetime.strptime(trx['tgl_sewa'], '%Y-%m-%d')
                 diff = (datetime.combine(tgl_kembali, datetime.min.time()) - tgl_sewa).days
-                
+
                 denda = 0
                 if trx['satuan'] == 'hari' and diff > trx['durasi']:
                     denda = (diff - trx['durasi']) * 50000
                 elif trx['satuan'] == 'jam' and diff * 24 > trx['durasi']:
                     denda = (diff * 24 - trx['durasi']) * 10000
-                
+
                 total_bayar = trx['total_biaya'] + denda
-                
+
                 conn = db.get_connection()
                 try:
                     conn.execute("UPDATE transaksi SET status='selesai' WHERE id=?", (int(selected),))
@@ -811,7 +877,8 @@ def transaksi_page():
                 finally:
                     conn.close()
                 st.rerun()
-    
+            glass_close()
+
     with tab3:
         df = get_df("""
             SELECT t.id, p.nama, m.nopol, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya, t.status
@@ -820,21 +887,19 @@ def transaksi_page():
             JOIN motor m ON t.motor_id = m.id
             ORDER BY t.tgl_sewa DESC
         """)
+        glass_open("Riwayat Transaksi")
         if df.empty:
             st.info("Belum ada riwayat transaksi.")
         else:
             df['total_biaya'] = df['total_biaya'].apply(format_rp)
             st.dataframe(df, use_container_width=True, hide_index=True)
+        glass_close()
 
 # ============ LAPORAN PAGE ============
 def laporan_page():
-    st.markdown("""
-    <div class="main-header">
-        <h1>📊 Laporan Cabang</h1>
-        <p>Laporan transaksi dan pendapatan</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
+    section_header("Insight", "📊 Laporan Cabang", "Laporan transaksi dan pendapatan per periode")
+
+    glass_open()
     c1, c2, c3 = st.columns(3)
     with c1:
         periode = st.selectbox("Periode", ["Harian","Mingguan","Bulanan"])
@@ -844,10 +909,8 @@ def laporan_page():
         st.write("")
         st.write("")
         export = st.button("📥 Export Excel")
-    
-    # Query berdasarkan periode (still parameterized -- tanggal is a
-    # date object from st.date_input, not raw user text, but we pass it
-    # as a bound parameter regardless to stay consistent and safe).
+    glass_close()
+
     tanggal_str = tanggal.strftime('%Y-%m-%d')
     if periode == "Harian":
         filter_clause = "DATE(t.tgl_sewa) = ?"
@@ -860,7 +923,7 @@ def laporan_page():
         start = tanggal.replace(day=1).strftime('%Y-%m-%d')
         filter_clause = "t.tgl_sewa BETWEEN ? AND ?"
         filter_params = [start, tanggal_str]
-    
+
     df = get_df(f"""
         SELECT t.id, t.motor_id, p.nama, m.nopol, m.merek, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya, t.status
         FROM transaksi t
@@ -869,19 +932,33 @@ def laporan_page():
         WHERE {filter_clause}
         ORDER BY t.tgl_sewa DESC
     """, tuple(filter_params))
-    
-    # Summary
+
     c1, c2, c3, c4 = st.columns(4)
-    with c1: st.metric("Total Transaksi", len(df))
-    with c2: st.metric("Total Pendapatan", format_rp(df['total_biaya'].sum() if len(df) > 0 else 0))
-    with c3: st.metric("Rata-rata/Transaksi", format_rp(df['total_biaya'].mean() if len(df)>0 else 0))
-    with c4: st.metric("Motor Tersewa", df['motor_id'].nunique() if not df.empty else 0)
-    
+    with c1:
+        st.markdown(f"""<div class="stat-card">
+            <h3>Total Transaksi</h3><div class="value">{len(df)}</div>
+        </div>""", unsafe_allow_html=True)
+    with c2:
+        st.markdown(f"""<div class="stat-card purple">
+            <h3>Total Pendapatan</h3><div class="value" style="font-size:1.25rem;">{format_rp(df['total_biaya'].sum() if len(df) > 0 else 0)}</div>
+        </div>""", unsafe_allow_html=True)
+    with c3:
+        st.markdown(f"""<div class="stat-card orange">
+            <h3>Rata-rata/Transaksi</h3><div class="value" style="font-size:1.25rem;">{format_rp(df['total_biaya'].mean() if len(df)>0 else 0)}</div>
+        </div>""", unsafe_allow_html=True)
+    with c4:
+        st.markdown(f"""<div class="stat-card green">
+            <h3>Motor Tersewa</h3><div class="value">{df['motor_id'].nunique() if not df.empty else 0}</div>
+        </div>""", unsafe_allow_html=True)
+
+    st.write("")
+    glass_open(f"Detail Transaksi · {periode}")
     if df.empty:
         st.info("Tidak ada transaksi pada periode ini.")
     else:
         st.dataframe(df, use_container_width=True, hide_index=True)
-    
+    glass_close()
+
     if export and not df.empty:
         buffer = io.BytesIO()
         with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
@@ -894,19 +971,13 @@ def laporan_page():
 
 # ============ ADMIN PAGE ============
 def admin_page():
-    st.markdown("""
-    <div class="main-header">
-        <h1>🏢 Dashboard Admin Pusat</h1>
-        <p>Monitoring seluruh cabang rental motor</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Stats Nasional
+    section_header("Pusat Kendali", "🏢 Dashboard Admin Pusat", "Monitoring seluruh cabang rental motor")
+
     total_cabang = 1  # Simplified
     total_trx = get_df("SELECT COUNT(*) c FROM transaksi").iloc[0]['c']
     total_pelanggan = get_df("SELECT COUNT(*) c FROM pelanggan").iloc[0]['c']
     total_pendapatan = get_df("SELECT COALESCE(SUM(total_bayar),0) t FROM pengembalian").iloc[0]['t']
-    
+
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown(f"""<div class="stat-card">
@@ -922,14 +993,14 @@ def admin_page():
         </div>""", unsafe_allow_html=True)
     with c4:
         st.markdown(f"""<div class="stat-card purple">
-            <h3>Total Pendapatan</h3><div class="value" style="font-size:1.2rem;">{format_rp(total_pendapatan)}</div>
+            <h3>Total Pendapatan</h3><div class="value" style="font-size:1.15rem;">{format_rp(total_pendapatan)}</div>
         </div>""", unsafe_allow_html=True)
-    
-    st.markdown("---")
-    
+
+    st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
+
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("📈 Tren Transaksi Bulanan")
+        glass_open("📈 Tren Transaksi Bulanan")
         df_monthly = get_df("""
             SELECT strftime('%Y-%m', tgl_sewa) as bulan, COUNT(*) as jumlah
             FROM transaksi GROUP BY bulan ORDER BY bulan
@@ -938,11 +1009,13 @@ def admin_page():
             st.info("Belum ada data transaksi.")
         else:
             fig = px.bar(df_monthly, x='bulan', y='jumlah')
-            fig.update_traces(marker_color='#667eea')
+            fig.update_traces(marker_color='#6D5EF5', marker_line_width=0)
+            fig.update_layout(height=300, **PLOTLY_LAYOUT)
             st.plotly_chart(fig, use_container_width=True)
-    
+        glass_close()
+
     with col2:
-        st.subheader("🏍️ Motor Terpopuler")
+        glass_open("🏍️ Motor Terpopuler")
         df_pop = get_df("""
             SELECT m.merek, COUNT(*) as jumlah 
             FROM transaksi t JOIN motor m ON t.motor_id = m.id
@@ -952,11 +1025,13 @@ def admin_page():
             st.info("Belum ada data transaksi.")
         else:
             fig = px.bar(df_pop, x='jumlah', y='merek', orientation='h')
-            fig.update_traces(marker_color='#10b981')
+            fig.update_traces(marker_color='#22D3EE', marker_line_width=0)
+            fig.update_layout(height=300, **PLOTLY_LAYOUT)
             st.plotly_chart(fig, use_container_width=True)
-    
+        glass_close()
+
     # Monitoring Sync
-    st.subheader("🔄 Status Sinkronisasi Cabang")
+    glass_open("🔄 Status Sinkronisasi Cabang")
     sync_data = pd.DataFrame({
         'Cabang': ['Cabang Asoka', 'Cabang Pusat'],
         'Status': ['🟢 Online', '🟢 Online'],
@@ -965,9 +1040,9 @@ def admin_page():
         'Data Pending': [0, 2]
     })
     st.dataframe(sync_data, use_container_width=True, hide_index=True)
-    st.markdown("---")
-    st.subheader("📷 Monitoring Motor Cabang")
+    glass_close()
 
+    glass_open("📷 Monitoring Motor Cabang")
     motor_df = get_df("""
         SELECT id,nopol,merek,status,keterangan,foto
         FROM motor
@@ -976,8 +1051,7 @@ def admin_page():
     if motor_df.empty:
         st.info("Belum ada data motor.")
     else:
-        for _, row in motor_df.iterrows():
-
+        for idx, row in motor_df.iterrows():
             col1, col2 = st.columns([1,2])
 
             with col1:
@@ -992,7 +1066,7 @@ def admin_page():
 
             with col2:
                 st.write(f"**Motor:** {row['merek']}")
-                st.write(f"**Status:** {row['status']}")
+                st.markdown(plate_chip(row['status']), unsafe_allow_html=True)
                 st.write(f"**Keterangan:** {row['keterangan'] if row['keterangan'] else '-'}")
 
                 if row["foto"] is not None:
@@ -1003,29 +1077,37 @@ def admin_page():
                         mime="image/jpeg",
                         key=f"dl_{row['id']}"
                     )
+            if idx < len(motor_df) - 1:
+                st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
+    glass_close()
 
 # ============ MAIN APP ============
 def main():
     if not st.session_state.logged_in:
         login_page()
         return
-    
+
     # Sidebar Navigation
     with st.sidebar:
-        st.markdown(f"""
-        <div style="text-align:center; padding:1rem 0;">
-            <div style="font-size:3rem;">🏍️</div>
-            <h2 style="color:white; margin:0;">SIMOTOR</h2>
-            <p style="color:#cbd5e1; font-size:0.85rem;">Rental Motor Asoka</p>
+        st.markdown("""
+        <div style="text-align:center; padding:1.2rem 0 0.6rem;">
+            <div style="font-size:2.6rem;">🏍️</div>
+            <h2 style="color:white; margin:0; font-size:1.3rem;">SIMOTOR</h2>
+            <p style="color:#A9B0D4; font-size:0.82rem; margin-top:0.2rem;">Rental Motor Asoka</p>
         </div>
         """, unsafe_allow_html=True)
-        
+
         st.markdown("---")
-        st.markdown(f"👤 **{st.session_state.user['username']}**")
-        st.markdown(f"🏷️ Role: `{st.session_state.user['role']}`")
-        st.markdown(f"🏢 Cabang: `{st.session_state.user['cabang']}`")
+        st.markdown(f"""
+        <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
+                    border-radius:12px; padding:0.8rem 1rem; margin-bottom:0.8rem;">
+            <div style="color:#fff; font-weight:700; font-size:0.95rem;">👤 {st.session_state.user['username']}</div>
+            <div style="color:#A9B0D4; font-size:0.8rem; margin-top:0.25rem;">🏷️ {st.session_state.user['role'].capitalize()}</div>
+            <div style="color:#A9B0D4; font-size:0.8rem;">🏢 {st.session_state.user['cabang']}</div>
+        </div>
+        """, unsafe_allow_html=True)
         st.markdown("---")
-        
+
         if st.session_state.user['role'] == 'admin':
             menu = st.radio(
                 "📋 Menu",
@@ -1039,20 +1121,20 @@ def main():
                 ["🏍️ Motor", "👥 Pelanggan",
                 "🧾 Transaksi"],
                 label_visibility="collapsed"
-            )   
-        
+            )
+
         st.markdown("---")
         if st.button("🚪 Logout", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.user = None
             st.rerun()
-        
+
         st.markdown("""
-        <div style="position:fixed; bottom:20px; left:20px; color:#cbd5e1; font-size:0.75rem;">
-            SIMOTOR v1.0<br>© 2024 Asoka Rental
+        <div style="position:fixed; bottom:18px; left:24px; color:#7C84B5; font-size:0.72rem;">
+            SIMOTOR v2.0<br>© 2024 Asoka Rental
         </div>
         """, unsafe_allow_html=True)
-    
+
     # Route pages
     if "Dashboard" in menu: dashboard_page()
     elif "Motor" in menu: motor_page()
