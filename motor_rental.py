@@ -32,12 +32,13 @@ CUSTOM_CSS = """
     --rose-soft: #fb7185;
     --emerald: #10b981;
     --emerald-soft: #34d399;
-    --slate: #64748b;
+    --slate: #475569;
+    --slate-dark: #1e293b;
     --slate-light: #94a3b8;
     --surface: #ffffff;
     --surface-glass: rgba(255, 255, 255, 0.72);
     --border-glass: rgba(255, 255, 255, 0.6);
-    --border-subtle: rgba(15, 23, 42, 0.06);
+    --border-subtle: rgba(15, 23, 42, 0.08);
     --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.06);
     --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
     --shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04);
@@ -130,6 +131,42 @@ p, span, label, div {
     border-color: transparent !important;
     box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4) !important;
     color: white !important;
+}
+
+/* ---------- Logout Button (Sidebar) ---------- */
+.logout-wrapper {
+    margin-top: 0.5rem;
+}
+
+.logout-wrapper button {
+    background: rgba(244, 63, 94, 0.08) !important;
+    color: #fda4af !important;
+    border: 1.5px solid rgba(244, 63, 94, 0.25) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 0.7rem 1.2rem !important;
+    font-weight: 600 !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.9rem !important;
+    box-shadow: none !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+}
+
+.logout-wrapper button:hover {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+    border-color: transparent !important;
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+.logout-wrapper button:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
 }
 
 /* ---------- Header Banner ---------- */
@@ -261,7 +298,7 @@ p, span, label, div {
     background: linear-gradient(90deg, var(--violet-dark), var(--cyan-soft));
 }
 
-/* ---------- Stat Cards - Scrollable Version ---------- */
+/* ---------- Stat Cards ---------- */
 .stat-card {
     position: relative;
     background: var(--surface);
@@ -382,7 +419,7 @@ p, span, label, div {
 
 [data-testid="stDataFrame"] thead tr th {
     background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
-    color: var(--slate) !important;
+    color: var(--slate-dark) !important;
     font-weight: 700 !important;
     font-size: 0.75rem !important;
     text-transform: uppercase !important;
@@ -454,7 +491,7 @@ p, span, label, div {
 .stSelectbox > div > div > div,
 .stTextArea > div > div > textarea {
     background: var(--surface) !important;
-    border: 1.5px solid rgba(15, 23, 42, 0.08) !important;
+    border: 1.5px solid rgba(15, 23, 42, 0.1) !important;
     border-radius: var(--radius-sm) !important;
     padding: 0.7rem 1rem !important;
     font-family: 'Inter', sans-serif !important;
@@ -474,17 +511,20 @@ p, span, label, div {
     outline: none !important;
 }
 
+/* ---------- Form Labels - MORE VISIBLE ---------- */
 .stTextInput label,
 .stNumberInput label,
 .stSelectbox label,
 .stTextArea label,
-.stFileUploader label {
-    font-weight: 600 !important;
-    font-size: 0.82rem !important;
-    color: var(--slate) !important;
+.stFileUploader label,
+.stDateInput label {
+    font-weight: 700 !important;
+    font-size: 0.78rem !important;
+    color: var(--slate-dark) !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.04em !important;
-    margin-bottom: 0.4rem !important;
+    letter-spacing: 0.06em !important;
+    margin-bottom: 0.5rem !important;
+    display: block !important;
 }
 
 /* ---------- Login Box ---------- */
@@ -642,7 +682,7 @@ p, span, label, div {
 }
 
 [data-testid="stMetric"] label {
-    color: var(--slate) !important;
+    color: var(--slate-dark) !important;
     font-size: 0.75rem !important;
     text-transform: uppercase !important;
     letter-spacing: 0.06em !important;
@@ -835,11 +875,10 @@ def dashboard_page():
     pendapatan = get_df("SELECT COALESCE(SUM(total_bayar),0) t FROM pengembalian").iloc[0]['t']
     total_pelanggan = get_df("SELECT COUNT(*) c FROM pelanggan").iloc[0]['c']
 
-    # Scrollable stats container
     st.markdown(f"""
     <div class="stats-scroll-container">
         <div class="stat-card">
-            <h3>Transaksi Hari Ini <span class="icon">📋</span></h3>
+            <h3>Transaksi Hari Ini <span class="icon"></span></h3>
             <div class="value">{trx_hari_ini}</div>
         </div>
         <div class="stat-card green">
@@ -851,7 +890,7 @@ def dashboard_page():
             <div class="value">{motor_disewa}</div>
         </div>
         <div class="stat-card purple">
-            <h3>Pendapatan <span class="icon"></span></h3>
+            <h3>Pendapatan <span class="icon">💰</span></h3>
             <div class="value" style="font-size:1.4rem;">{format_rp(pendapatan)}</div>
         </div>
         <div class="stat-card red">
@@ -931,12 +970,12 @@ def dashboard_page():
 
 # ============ MOTOR PAGE ============
 def motor_page():
-    section_header("Armada", "🏍️ Manajemen Motor", "Kelola data, status, dan foto armada motor rental")
+    section_header("Armada", "️ Manajemen Motor", "Kelola data, status, dan foto armada motor rental")
 
     glass_open()
     col1, col2 = st.columns([2, 1])
     with col1:
-        search = st.text_input("🔍 Cari motor (nopol/merek)")
+        search = st.text_input("Cari motor (nopol/merek)")
     with col2:
         filter_status = st.selectbox("Filter Status", ["semua","tersedia","disewa","rusak","servis"])
     glass_close()
@@ -968,8 +1007,8 @@ def motor_page():
                 tarif_jam = st.number_input("Tarif/Jam", min_value=0, value=10000)
                 tarif_hari = st.number_input("Tarif/Hari", min_value=0, value=80000)
                 status = st.selectbox("Status", ["tersedia","disewa","rusak","servis"])
-                foto = st.file_uploader("📷 Upload Foto Motor", type=["jpg","jpeg","png"])
-                keterangan = st.text_area("📝 Keterangan Motor")
+                foto = st.file_uploader("Upload Foto Motor", type=["jpg","jpeg","png"])
+                keterangan = st.text_area("Keterangan Motor")
 
             col_a, col_b = st.columns(2)
             with col_a:
@@ -1016,7 +1055,7 @@ def motor_page():
         )
         glass_close()
 
-        glass_open("️ Edit / Hapus Motor")
+        glass_open("✏️ Edit / Hapus Motor")
         selected = st.selectbox("Pilih Motor", df['nopol'].tolist())
         if selected:
             motor = df[df['nopol']==selected].iloc[0]
@@ -1030,8 +1069,8 @@ def motor_page():
             with c1:
                 new_status = st.selectbox("Ubah Status", ["tersedia","disewa","rusak","servis"],
                     index=["tersedia","disewa","rusak","servis"].index(motor['status']))
-                new_foto = st.file_uploader("📷 Ganti Foto Motor", type=["jpg","jpeg","png"], key="edit_foto")
-                new_keterangan = st.text_area(" Keterangan Motor",
+                new_foto = st.file_uploader("Ganti Foto Motor", type=["jpg","jpeg","png"], key="edit_foto")
+                new_keterangan = st.text_area("Keterangan Motor",
                     value=motor['keterangan'] if ('keterangan' in motor.index and motor['keterangan'] is not None) else "")
                 if st.button("💾 Update Motor"):
                     conn = db.get_connection()
@@ -1070,11 +1109,11 @@ def motor_page():
 def pelanggan_page():
     section_header("Database", "👥 Manajemen Pelanggan", "Kelola data pelanggan rental")
 
-    tab1, tab2 = st.tabs(["📋 Daftar Pelanggan", "➕ Tambah Pelanggan"])
+    tab1, tab2 = st.tabs([" Daftar Pelanggan", "➕ Tambah Pelanggan"])
 
     with tab1:
         glass_open()
-        search = st.text_input("🔍 Cari pelanggan")
+        search = st.text_input("Cari pelanggan")
         if search:
             like = f"%{search}%"
             df = get_df("SELECT * FROM pelanggan WHERE nama LIKE ? OR ktp LIKE ?", (like, like))
@@ -1118,7 +1157,7 @@ def pelanggan_page():
 def transaksi_page():
     section_header("Operasional", "🧾 Transaksi Penyewaan", "Buat transaksi sewa motor baru")
 
-    tab1, tab2, tab3 = st.tabs(["➕ Sewa Baru", "🔄 Pengembalian", "📋 Riwayat"])
+    tab1, tab2, tab3 = st.tabs(["➕ Sewa Baru", " Pengembalian", "📋 Riwayat"])
 
     with tab1:
         pel_list = get_df("SELECT id, nama, ktp FROM pelanggan")
@@ -1145,7 +1184,7 @@ def transaksi_page():
                 satuan = st.selectbox("Satuan", ["hari","jam"])
                 tarif = motor_row['tarif_hari'] if satuan == 'hari' else motor_row['tarif_jam']
                 total = tarif * durasi
-                st.metric("💰 Total Biaya", format_rp(total))
+                st.metric("Total Biaya", format_rp(total))
 
             if st.form_submit_button("✅ Simpan Transaksi"):
                 conn = db.get_connection()
@@ -1160,7 +1199,7 @@ def transaksi_page():
 
                     st.markdown(f"""
                     <div class="struk-card">
-                        <h3>🧾 STRUK SEWA MOTOR</h3>
+                        <h3> STRUK SEWA MOTOR</h3>
                         <hr>
                         <p><b>Tanggal:</b> {datetime.now().strftime('%d-%m-%Y %H:%M')}</p>
                         <p><b>Motor:</b> {motor_sel}</p>
@@ -1274,11 +1313,10 @@ def laporan_page():
         ORDER BY t.tgl_sewa DESC
     """, tuple(filter_params))
 
-    # Scrollable stats for laporan
     st.markdown(f"""
     <div class="stats-scroll-container">
         <div class="stat-card">
-            <h3>Total Transaksi <span class="icon"></span></h3>
+            <h3>Total Transaksi <span class="icon">📊</span></h3>
             <div class="value">{len(df)}</div>
         </div>
         <div class="stat-card purple">
@@ -1323,7 +1361,6 @@ def admin_page():
     total_pelanggan = get_df("SELECT COUNT(*) c FROM pelanggan").iloc[0]['c']
     total_pendapatan = get_df("SELECT COALESCE(SUM(total_bayar),0) t FROM pengembalian").iloc[0]['t']
 
-    # Scrollable stats for admin
     st.markdown(f"""
     <div class="stats-scroll-container">
         <div class="stat-card">
@@ -1331,7 +1368,7 @@ def admin_page():
             <div class="value">{total_cabang}</div>
         </div>
         <div class="stat-card green">
-            <h3>Total Transaksi <span class="icon"></span></h3>
+            <h3>Total Transaksi <span class="icon">📋</span></h3>
             <div class="value">{total_trx}</div>
         </div>
         <div class="stat-card orange">
@@ -1408,7 +1445,7 @@ def admin_page():
                 st.markdown(plate_chip(row['status']), unsafe_allow_html=True)
                 st.write(f"**Keterangan:** {row['keterangan'] if row['keterangan'] else '-'}")
                 if row["foto"] is not None:
-                    st.download_button("⬇️ Download Foto", data=bytes(row["foto"]),
+                    st.download_button("️ Download Foto", data=bytes(row["foto"]),
                         file_name=f"{row['nopol']}.jpg", mime="image/jpeg", key=f"dl_{row['id']}")
             if idx < len(motor_df) - 1:
                 st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
@@ -1441,15 +1478,19 @@ def main():
         st.markdown("---")
 
         if st.session_state.user['role'] == 'admin':
-            menu = st.radio("📋 Menu", ["📊 Dashboard", "📈 Laporan", "🏢 Admin Pusat"], label_visibility="collapsed")
+            menu = st.radio("Menu", ["📊 Dashboard", "📈 Laporan", "🏢 Admin Pusat"], label_visibility="collapsed")
         else:
-            menu = st.radio("📋 Menu", ["🏍️ Motor", "👥 Pelanggan", "🧾 Transaksi"], label_visibility="collapsed")
+            menu = st.radio("Menu", ["🏍️ Motor", " Pelanggan", "🧾 Transaksi"], label_visibility="collapsed")
 
         st.markdown("---")
-        if st.button("🚪 Logout", use_container_width=True):
+        
+        # Logout button with wrapper for custom styling
+        st.markdown('<div class="logout-wrapper">', unsafe_allow_html=True)
+        if st.button("🚪 Logout", use_container_width=True, key="logout_btn"):
             st.session_state.logged_in = False
             st.session_state.user = None
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown("""
         <div style="position:fixed; bottom:18px; left:24px; color:#FFFFFF; opacity:0.6; font-size:0.72rem;">
