@@ -404,45 +404,36 @@ p, span, label, div {
     outline: none !important;
 }
 
-/* ========== SELECTBOX - SAMAKAN UKURAN KOTAK ========== */
-/* Perkecil lebar container selectbox */
+/* ========== SELECTBOX - PERBESAR & PERJELAS TEKS ========== */
+/* Perbesar container selectbox */
 div[data-testid="stSelectbox"] {
     margin-bottom: 1rem !important;
-    max-width: 200px !important;
 }
 
-/* Samakan tinggi kotak teks "Harian" dengan kotak panah */
+/* Perbesar tinggi dan padding selectbox */
 div[data-testid="stSelectbox"] > div > div {
-    min-height: 40px !important;
-    height: 40px !important;
+    min-height: 56px !important;
+    padding: 8px 12px !important;
 }
 
-/* Area teks selectbox - KECILKAN */
+/* Perbesar font size teks di dalam selectbox */
 div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
-    min-height: 38px !important;
-    height: 38px !important;
-    padding: 6px 12px !important;
-    font-size: 0.85rem !important;
-    font-weight: 500 !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
     color: #0f172a !important;
+    min-height: 40px !important;
     display: flex !important;
     align-items: center !important;
 }
 
-/* Samakan ukuran kotak panah dropdown */
-div[data-testid="stSelectbox"] [data-baseweb="select"] > div:last-child {
-    min-height: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
-    width: 38px !important;
-}
-
-/* Dropdown menu options */
+/* Perbesar dropdown menu options */
 div[data-testid="stSelectbox"] [data-baseweb="menu"] [data-baseweb="option"] {
-    padding: 8px 12px !important;
-    font-size: 0.85rem !important;
+    padding: 12px 16px !important;
+    font-size: 1rem !important;
     font-weight: 500 !important;
-    min-height: 36px !important;
+    min-height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
 }
 
 /* ========== LICENSE PLATE CHIP ========== */
@@ -857,7 +848,7 @@ def login_page():
     with col2:
         st.markdown("""
         <div class="login-shell">
-            <div class="login-logo-wrap">️</div>
+            <div class="login-logo-wrap">🏍️</div>
             <h2>SIMOTOR</h2>
             <p class="sub">Sistem Rental Motor Asoka &middot; Terdistribusi</p>
         </div>
@@ -886,7 +877,7 @@ def login_page():
 
 # ============ DASHBOARD PAGE ============
 def dashboard_page():
-    section_header("Ringkasan Operasional", "📊 Dashboard", "Pantau performa rental hari ini secara langsung")
+    section_header("Ringkasan Operasional", " Dashboard", "Pantau performa rental hari ini secara langsung")
 
     today = datetime.now().strftime('%Y-%m-%d')
     trx_hari_ini = get_df("SELECT COUNT(*) c FROM transaksi WHERE tgl_sewa=?", (today,)).iloc[0]['c']
@@ -914,7 +905,7 @@ def dashboard_page():
             <div class="value" style="font-size:1.4rem;">{format_rp(pendapatan)}</div>
         </div>
         <div class="stat-card red">
-            <h3>Pelanggan <span class="icon">👥</span></h3>
+            <h3>Pelanggan <span class="icon"></span></h3>
             <div class="value">{total_pelanggan}</div>
         </div>
     </div>
@@ -925,7 +916,7 @@ def dashboard_page():
     col1, col2 = st.columns(2)
 
     with col1:
-        glass_open("📈 Transaksi 7 Hari Terakhir")
+        glass_open(" Transaksi 7 Hari Terakhir")
         df_trx = get_df("""
             SELECT tgl_sewa, COUNT(*) as jumlah 
             FROM transaksi 
@@ -943,7 +934,7 @@ def dashboard_page():
         glass_close()
 
     with col2:
-        glass_open("🏍️ Status Motor")
+        glass_open("️ Status Motor")
         df_status = get_df("SELECT status, COUNT(*) as jumlah FROM motor GROUP BY status")
         if df_status.empty:
             st.info("Belum ada data motor.")
@@ -973,7 +964,7 @@ def dashboard_page():
         st.plotly_chart(fig, use_container_width=True)
     glass_close()
 
-    glass_open("📝 Transaksi Terbaru")
+    glass_open(" Transaksi Terbaru")
     df_recent = get_df("""
         SELECT t.id, p.nama, m.nopol, m.merek, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya, t.status
         FROM transaksi t
@@ -1012,7 +1003,7 @@ def motor_page():
 
     df = get_df(query, tuple(params) if params else None)
 
-    if st.button("➕ Tambah Motor Baru"):
+    if st.button(" Tambah Motor Baru"):
         st.session_state.show_motor_form = True
 
     if st.session_state.get('show_motor_form'):
@@ -1075,7 +1066,7 @@ def motor_page():
         )
         glass_close()
 
-        glass_open("️ Edit / Hapus Motor")
+        glass_open("✏️ Edit / Hapus Motor")
         selected = st.selectbox("Pilih Motor", df['nopol'].tolist())
         if selected:
             motor = df[df['nopol']==selected].iloc[0]
@@ -1175,9 +1166,9 @@ def pelanggan_page():
 
 # ============ TRANSAKSI PAGE ============
 def transaksi_page():
-    section_header("Operasional", " Transaksi Penyewaan", "Buat transaksi sewa motor baru")
+    section_header("Operasional", "🧾 Transaksi Penyewaan", "Buat transaksi sewa motor baru")
 
-    tab1, tab2, tab3 = st.tabs(["➕ Sewa Baru", "📤 Pengembalian", "📋 Riwayat"])
+    tab1, tab2, tab3 = st.tabs(["➕ Sewa Baru", " Pengembalian", "📋 Riwayat"])
 
     with tab1:
         pel_list = get_df("SELECT id, nama, ktp FROM pelanggan")
@@ -1219,7 +1210,7 @@ def transaksi_page():
 
                     st.markdown(f"""
                     <div class="struk-card">
-                        <h3>🧾 STRUK SEWA MOTOR</h3>
+                        <h3> STRUK SEWA MOTOR</h3>
                         <hr>
                         <p><b>Tanggal:</b> {datetime.now().strftime('%d-%m-%Y %H:%M')}</p>
                         <p><b>Motor:</b> {motor_sel}</p>
@@ -1251,7 +1242,7 @@ def transaksi_page():
             selected = st.selectbox("Pilih Transaksi untuk Dikembalikan", trx_aktif['id'].tolist())
             tgl_kembali = st.date_input("Tanggal Kembali", datetime.now())
 
-            if st.button("📤 Proses Pengembalian"):
+            if st.button(" Proses Pengembalian"):
                 trx = trx_aktif[trx_aktif['id']==selected].iloc[0]
                 tgl_sewa = datetime.strptime(trx['tgl_sewa'], '%Y-%m-%d')
                 diff = (datetime.combine(tgl_kembali, datetime.min.time()) - tgl_sewa).days
@@ -1366,7 +1357,7 @@ def laporan_page():
         buffer = io.BytesIO()
         with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
             df.to_excel(writer, index=False, sheet_name='Laporan')
-        st.download_button("⬇️ Download Excel", buffer.getvalue(),
+        st.download_button("️ Download Excel", buffer.getvalue(),
                           f"laporan_{periode.lower()}_{tanggal}.xlsx",
                           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     elif export and df.empty:
@@ -1388,7 +1379,7 @@ def admin_page():
             <div class="value">{total_cabang}</div>
         </div>
         <div class="stat-card green">
-            <h3>Total Transaksi <span class="icon">📋</span></h3>
+            <h3>Total Transaksi <span class="icon"></span></h3>
             <div class="value">{total_trx}</div>
         </div>
         <div class="stat-card orange">
@@ -1439,7 +1430,7 @@ def admin_page():
     glass_open(" Status Sinkronisasi Cabang")
     sync_data = pd.DataFrame({
         'Cabang': ['Cabang Asoka', 'Cabang Pusat'],
-        'Status': ['🟢 Online', '🟢 Online'],
+        'Status': ['🟢 Online', ' Online'],
         'Last Sync': [datetime.now().strftime('%Y-%m-%d %H:%M'), 
                       (datetime.now() - timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M')],
         'Data Pending': [0, 2]
@@ -1465,7 +1456,7 @@ def admin_page():
                 st.markdown(plate_chip(row['status']), unsafe_allow_html=True)
                 st.write(f"**Keterangan:** {row['keterangan'] if row['keterangan'] else '-'}")
                 if row["foto"] is not None:
-                    st.download_button("⬇️ Download Foto", data=bytes(row["foto"]),
+                    st.download_button("️ Download Foto", data=bytes(row["foto"]),
                         file_name=f"{row['nopol']}.jpg", mime="image/jpeg", key=f"dl_{row['id']}")
             if idx < len(motor_df) - 1:
                 st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
@@ -1492,19 +1483,19 @@ def main():
                     border-radius:12px; padding:0.8rem 1rem; margin-bottom:0.8rem;">
             <div style="color:#FFFFFF; font-weight:700; font-size:0.95rem;">👤 {st.session_state.user['username']}</div>
             <div style="color:#FFFFFF; opacity:0.85; font-size:0.8rem; margin-top:0.25rem;">🏷️ {st.session_state.user['role'].capitalize()}</div>
-            <div style="color:#FFFFFF; opacity:0.85; font-size:0.8rem;">🏢 {st.session_state.user['cabang']}</div>
+            <div style="color:#FFFFFF; opacity:0.85; font-size:0.8rem;"> {st.session_state.user['cabang']}</div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown("---")
 
         if st.session_state.user['role'] == 'admin':
-            menu = st.radio("Menu", ["📊 Dashboard", "📈 Laporan", "🏢 Admin Pusat"], label_visibility="collapsed")
+            menu = st.radio("Menu", [" Dashboard", " Laporan", " Admin Pusat"], label_visibility="collapsed")
         else:
-            menu = st.radio("Menu", ["🏍️ Motor", "👥 Pelanggan", "🧾 Transaksi"], label_visibility="collapsed")
+            menu = st.radio("Menu", ["️ Motor", "👥 Pelanggan", "🧾 Transaksi"], label_visibility="collapsed")
 
         st.markdown("---")
         
-        # Logout button
+        # Logout button - TANPA ICON PINTU
         if st.button("Logout", use_container_width=True, key="logout_btn"):
             st.session_state.logged_in = False
             st.session_state.user = None
@@ -1525,7 +1516,7 @@ def main():
         if st.session_state.user['role'] == 'admin':
             admin_page()
         else:
-            st.error(" Akses ditolak! Hanya admin yang dapat mengakses halaman ini.")
+            st.error("❌ Akses ditolak! Hanya admin yang dapat mengakses halaman ini.")
 
 if __name__ == "__main__":
     main()
