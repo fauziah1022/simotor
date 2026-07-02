@@ -133,37 +133,37 @@ p, span, label, div {
 }
 
 /* ========== LOGOUT BUTTON - SIDEBAR (DIPERBAIKI) ========== */
-/* Default: warna merah yang jelas terlihat di sidebar gelap */
+/* Default state: background gelap, teks putih */
 [data-testid="stSidebar"] .stButton > button {
-    background: rgba(239, 68, 68, 0.2) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     color: #ffffff !important;
-    border: 2px solid rgba(239, 68, 68, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
     border-radius: 12px !important;
     padding: 0.75rem 1.5rem !important;
-    font-weight: 700 !important;
+    font-weight: 600 !important;
     font-size: 0.95rem !important;
     font-family: 'Inter', sans-serif !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     width: 100% !important;
-    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2) !important;
+    box-shadow: none !important;
     letter-spacing: 0.02em !important;
 }
 
-/* Hover: merah penuh */
+/* Hover: berubah merah */
 [data-testid="stSidebar"] .stButton > button:hover {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
     color: #ffffff !important;
     border-color: transparent !important;
-    box-shadow: 0 8px 28px rgba(239, 68, 68, 0.5) !important;
-    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 8px 28px rgba(239, 68, 68, 0.4) !important;
+    transform: translateY(-2px) !important;
 }
 
-/* Active */
+/* Active state */
 [data-testid="stSidebar"] .stButton > button:active {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
     color: #ffffff !important;
-    transform: translateY(-1px) scale(1) !important;
-    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4) !important;
+    transform: translateY(0) !important;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3) !important;
 }
 
 /* ========== HEADER BANNER ========== */
@@ -412,6 +412,38 @@ div[data-testid="stWidget"] > div > div > label {
         0 0 0 4px rgba(99, 102, 241, 0.12),
         0 4px 12px rgba(99, 102, 241, 0.1) !important;
     outline: none !important;
+}
+
+/* ========== FIX DROPDOWN SELECTBOX - TEKS TIDAK TERPOTONG ========== */
+/* Pastikan container selectbox punya tinggi cukup */
+[data-testid="stSelectbox"] > div > div {
+    min-height: 48px !important;
+}
+
+/* Fix teks di dalam selectbox agar tidak terpotong */
+[data-testid="stSelectbox"] [data-baseweb="select"] > div {
+    min-height: 44px !important;
+    padding: 0.6rem 1rem !important;
+}
+
+[data-testid="stSelectbox"] [data-baseweb="select"] [data-baseweb="input"] {
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    color: var(--ink) !important;
+    padding: 0 !important;
+    min-height: 28px !important;
+    line-height: 1.4 !important;
+}
+
+/* Fix dropdown menu options */
+[data-testid="stSelectbox"] [data-baseweb="menu"] {
+    max-height: 300px !important;
+}
+
+[data-testid="stSelectbox"] [data-baseweb="menu"] [data-baseweb="option"] {
+    padding: 0.75rem 1rem !important;
+    min-height: 44px !important;
+    font-size: 0.9rem !important;
 }
 
 /* ========== LICENSE PLATE CHIP ========== */
@@ -869,7 +901,7 @@ def login_page():
 
 # ============ DASHBOARD PAGE ============
 def dashboard_page():
-    section_header("Ringkasan Operasional", "📊 Dashboard", "Pantau performa rental hari ini secara langsung")
+    section_header("Ringkasan Operasional", " Dashboard", "Pantau performa rental hari ini secara langsung")
 
     today = datetime.now().strftime('%Y-%m-%d')
     trx_hari_ini = get_df("SELECT COUNT(*) c FROM transaksi WHERE tgl_sewa=?", (today,)).iloc[0]['c']
@@ -956,7 +988,7 @@ def dashboard_page():
         st.plotly_chart(fig, use_container_width=True)
     glass_close()
 
-    glass_open("📝 Transaksi Terbaru")
+    glass_open(" Transaksi Terbaru")
     df_recent = get_df("""
         SELECT t.id, p.nama, m.nopol, m.merek, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya, t.status
         FROM transaksi t
@@ -1110,7 +1142,7 @@ def motor_page():
 
 # ============ PELANGGAN PAGE ============
 def pelanggan_page():
-    section_header("Database", "👥 Manajemen Pelanggan", "Kelola data pelanggan rental")
+    section_header("Database", " Manajemen Pelanggan", "Kelola data pelanggan rental")
 
     tab1, tab2 = st.tabs([" Daftar Pelanggan", "➕ Tambah Pelanggan"])
 
@@ -1202,7 +1234,7 @@ def transaksi_page():
 
                     st.markdown(f"""
                     <div class="struk-card">
-                        <h3>🧾 STRUK SEWA MOTOR</h3>
+                        <h3> STRUK SEWA MOTOR</h3>
                         <hr>
                         <p><b>Tanggal:</b> {datetime.now().strftime('%d-%m-%Y %H:%M')}</p>
                         <p><b>Motor:</b> {motor_sel}</p>
@@ -1349,7 +1381,7 @@ def laporan_page():
         buffer = io.BytesIO()
         with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
             df.to_excel(writer, index=False, sheet_name='Laporan')
-        st.download_button("⬇️ Download Excel", buffer.getvalue(),
+        st.download_button("️ Download Excel", buffer.getvalue(),
                           f"laporan_{periode.lower()}_{tanggal}.xlsx",
                           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     elif export and df.empty:
@@ -1481,7 +1513,7 @@ def main():
         st.markdown("---")
 
         if st.session_state.user['role'] == 'admin':
-            menu = st.radio("Menu", [" Dashboard", "📈 Laporan", " Admin Pusat"], label_visibility="collapsed")
+            menu = st.radio("Menu", [" Dashboard", " Laporan", " Admin Pusat"], label_visibility="collapsed")
         else:
             menu = st.radio("Menu", ["️ Motor", "👥 Pelanggan", "🧾 Transaksi"], label_visibility="collapsed")
 
