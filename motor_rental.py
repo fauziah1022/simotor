@@ -404,20 +404,6 @@ p, span, label, div {
     outline: none !important;
 }
 
-/* ========== LOGIN FORM SPACING ========== */
-/* Tambah jarak antar form elements di login page */
-[data-testid="stForm"] {
-    margin-top: 1.5rem !important;
-}
-
-[data-testid="stForm"] .stTextInput {
-    margin-bottom: 1.2rem !important;
-}
-
-[data-testid="stForm"] .stButton {
-    margin-top: 1.5rem !important;
-}
-
 /* ========== LICENSE PLATE CHIP ========== */
 .plate-chip {
     display: inline-flex;
@@ -823,9 +809,9 @@ def login_page():
 
         with st.form("login_form"):
             username = st.text_input("Username", placeholder="Masukkan username")
-            st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height: 0.8rem;'></div>", unsafe_allow_html=True)
             password = st.text_input("Password", type="password", placeholder="••••••••")
-            st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
             submitted = st.form_submit_button("Masuk ke Dashboard →", use_container_width=True)
 
             if submitted:
