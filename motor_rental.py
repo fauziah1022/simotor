@@ -132,12 +132,12 @@ p, span, label, div {
     color: white !important;
 }
 
-/* ========== LOGOUT BUTTON - SIDEBAR ========== */
-/* Default: merah muda transparan (kelihatan di sidebar gelap) */
+/* ========== LOGOUT BUTTON - SIDEBAR (DIPERBAIKI) ========== */
+/* Default: warna merah yang jelas terlihat di sidebar gelap */
 [data-testid="stSidebar"] .stButton > button {
-    background: rgba(239, 68, 68, 0.12) !important;
-    color: #fca5a5 !important;
-    border: 2px solid rgba(239, 68, 68, 0.35) !important;
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #ffffff !important;
+    border: 2px solid rgba(239, 68, 68, 0.5) !important;
     border-radius: 12px !important;
     padding: 0.75rem 1.5rem !important;
     font-weight: 700 !important;
@@ -145,7 +145,7 @@ p, span, label, div {
     font-family: 'Inter', sans-serif !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     width: 100% !important;
-    box-shadow: none !important;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2) !important;
     letter-spacing: 0.02em !important;
 }
 
@@ -367,7 +367,6 @@ p, span, label, div {
 }
 
 /* ========== FORM LABELS - SUPER VISIBLE ========== */
-/* Target semua label form agar terlihat jelas */
 .stTextInput label,
 .stNumberInput label,
 .stSelectbox label,
