@@ -229,7 +229,39 @@ p, span, label, div {
     gap: 0.5rem;
 }
 
-/* ---------- Stat Cards - FIXED ---------- */
+/* ---------- Scrollable Stats Container ---------- */
+.stats-scroll-container {
+    display: flex;
+    gap: 1.2rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 1rem 0.5rem 1.5rem 0.5rem;
+    margin: 0 -0.5rem;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+}
+
+.stats-scroll-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.stats-scroll-container::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.04);
+    border-radius: 3px;
+}
+
+.stats-scroll-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, var(--violet), var(--cyan));
+    border-radius: 3px;
+}
+
+.stats-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, var(--violet-dark), var(--cyan-soft));
+}
+
+/* ---------- Stat Cards - Scrollable Version ---------- */
 .stat-card {
     position: relative;
     background: var(--surface);
@@ -240,10 +272,13 @@ p, span, label, div {
     box-shadow: var(--shadow-md);
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
-    height: 150px;
+    min-width: 220px;
+    max-width: 220px;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    height: 150px;
 }
 
 .stat-card::before {
@@ -262,6 +297,7 @@ p, span, label, div {
 .stat-card:hover {
     transform: translateY(-6px);
     box-shadow: var(--shadow-xl);
+    border-color: rgba(99, 102, 241, 0.2);
 }
 
 .stat-card h3 {
@@ -682,8 +718,13 @@ p, span, label, div {
         font-size: 1.4rem;
     }
     
+    .stat-card {
+        min-width: 200px;
+        max-width: 200px;
+    }
+    
     .stat-card .value {
-        font-size: 1.6rem;
+        font-size: 1.8rem;
     }
     
     .glass-panel {
@@ -794,32 +835,31 @@ def dashboard_page():
     pendapatan = get_df("SELECT COALESCE(SUM(total_bayar),0) t FROM pengembalian").iloc[0]['t']
     total_pelanggan = get_df("SELECT COUNT(*) c FROM pelanggan").iloc[0]['c']
 
-    c1, c2, c3, c4, c5 = st.columns(5)
-    with c1:
-        st.markdown(f"""<div class="stat-card">
+    # Scrollable stats container
+    st.markdown(f"""
+    <div class="stats-scroll-container">
+        <div class="stat-card">
             <h3>Transaksi Hari Ini <span class="icon">📋</span></h3>
             <div class="value">{trx_hari_ini}</div>
-        </div>""", unsafe_allow_html=True)
-    with c2:
-        st.markdown(f"""<div class="stat-card green">
+        </div>
+        <div class="stat-card green">
             <h3>Motor Tersedia <span class="icon">✅</span></h3>
             <div class="value">{motor_tersedia}</div>
-        </div>""", unsafe_allow_html=True)
-    with c3:
-        st.markdown(f"""<div class="stat-card orange">
+        </div>
+        <div class="stat-card orange">
             <h3>Motor Disewa <span class="icon">🏍️</span></h3>
             <div class="value">{motor_disewa}</div>
-        </div>""", unsafe_allow_html=True)
-    with c4:
-        st.markdown(f"""<div class="stat-card purple">
-            <h3>Pendapatan <span class="icon">💰</span></h3>
+        </div>
+        <div class="stat-card purple">
+            <h3>Pendapatan <span class="icon"></span></h3>
             <div class="value" style="font-size:1.4rem;">{format_rp(pendapatan)}</div>
-        </div>""", unsafe_allow_html=True)
-    with c5:
-        st.markdown(f"""<div class="stat-card red">
+        </div>
+        <div class="stat-card red">
             <h3>Pelanggan <span class="icon">👥</span></h3>
             <div class="value">{total_pelanggan}</div>
-        </div>""", unsafe_allow_html=True)
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
 
@@ -976,7 +1016,7 @@ def motor_page():
         )
         glass_close()
 
-        glass_open("✏️ Edit / Hapus Motor")
+        glass_open("️ Edit / Hapus Motor")
         selected = st.selectbox("Pilih Motor", df['nopol'].tolist())
         if selected:
             motor = df[df['nopol']==selected].iloc[0]
@@ -991,7 +1031,7 @@ def motor_page():
                 new_status = st.selectbox("Ubah Status", ["tersedia","disewa","rusak","servis"],
                     index=["tersedia","disewa","rusak","servis"].index(motor['status']))
                 new_foto = st.file_uploader("📷 Ganti Foto Motor", type=["jpg","jpeg","png"], key="edit_foto")
-                new_keterangan = st.text_area("📝 Keterangan Motor",
+                new_keterangan = st.text_area(" Keterangan Motor",
                     value=motor['keterangan'] if ('keterangan' in motor.index and motor['keterangan'] is not None) else "")
                 if st.button("💾 Update Motor"):
                     conn = db.get_connection()
@@ -1234,27 +1274,27 @@ def laporan_page():
         ORDER BY t.tgl_sewa DESC
     """, tuple(filter_params))
 
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        st.markdown(f"""<div class="stat-card">
-            <h3>Total Transaksi <span class="icon">📊</span></h3>
+    # Scrollable stats for laporan
+    st.markdown(f"""
+    <div class="stats-scroll-container">
+        <div class="stat-card">
+            <h3>Total Transaksi <span class="icon"></span></h3>
             <div class="value">{len(df)}</div>
-        </div>""", unsafe_allow_html=True)
-    with c2:
-        st.markdown(f"""<div class="stat-card purple">
+        </div>
+        <div class="stat-card purple">
             <h3>Pendapatan <span class="icon">💰</span></h3>
             <div class="value" style="font-size:1.2rem;">{format_rp(df['total_biaya'].sum() if len(df) > 0 else 0)}</div>
-        </div>""", unsafe_allow_html=True)
-    with c3:
-        st.markdown(f"""<div class="stat-card orange">
+        </div>
+        <div class="stat-card orange">
             <h3>Rata-rata <span class="icon">📈</span></h3>
             <div class="value" style="font-size:1.2rem;">{format_rp(df['total_biaya'].mean() if len(df)>0 else 0)}</div>
-        </div>""", unsafe_allow_html=True)
-    with c4:
-        st.markdown(f"""<div class="stat-card green">
+        </div>
+        <div class="stat-card green">
             <h3>Motor Tersewa <span class="icon">🏍️</span></h3>
             <div class="value">{df['motor_id'].nunique() if not df.empty else 0}</div>
-        </div>""", unsafe_allow_html=True)
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.write("")
     glass_open(f"Detail Transaksi · {periode}")
@@ -1283,27 +1323,27 @@ def admin_page():
     total_pelanggan = get_df("SELECT COUNT(*) c FROM pelanggan").iloc[0]['c']
     total_pendapatan = get_df("SELECT COALESCE(SUM(total_bayar),0) t FROM pengembalian").iloc[0]['t']
 
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        st.markdown(f"""<div class="stat-card">
+    # Scrollable stats for admin
+    st.markdown(f"""
+    <div class="stats-scroll-container">
+        <div class="stat-card">
             <h3>Total Cabang <span class="icon">🏢</span></h3>
             <div class="value">{total_cabang}</div>
-        </div>""", unsafe_allow_html=True)
-    with c2:
-        st.markdown(f"""<div class="stat-card green">
-            <h3>Total Transaksi <span class="icon">📋</span></h3>
+        </div>
+        <div class="stat-card green">
+            <h3>Total Transaksi <span class="icon"></span></h3>
             <div class="value">{total_trx}</div>
-        </div>""", unsafe_allow_html=True)
-    with c3:
-        st.markdown(f"""<div class="stat-card orange">
+        </div>
+        <div class="stat-card orange">
             <h3>Total Pelanggan <span class="icon">👥</span></h3>
             <div class="value">{total_pelanggan}</div>
-        </div>""", unsafe_allow_html=True)
-    with c4:
-        st.markdown(f"""<div class="stat-card purple">
+        </div>
+        <div class="stat-card purple">
             <h3>Pendapatan <span class="icon">💰</span></h3>
             <div class="value" style="font-size:1.15rem;">{format_rp(total_pendapatan)}</div>
-        </div>""", unsafe_allow_html=True)
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
 
