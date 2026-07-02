@@ -404,48 +404,35 @@ p, span, label, div {
     outline: none !important;
 }
 
-/* ========== SELECTBOX - PERBESAR & SPACE ========== */
+/* ========== SELECTBOX - PERKECIL KOTAK ========== */
+/* Perkecil lebar kotak selectbox Periode */
 div[data-testid="stSelectbox"] {
     margin-bottom: 1rem !important;
+    max-width: 220px !important;
 }
 
-/* Container luar selectbox - tambah padding */
+/* Container dalam selectbox */
 div[data-testid="stSelectbox"] > div > div {
-    min-height: 56px !important;
-    padding: 6px 10px !important;
+    min-height: 48px !important;
 }
 
-/* Area dalam selectbox - SPACE DARI BORDER */
-div[data-testid="stSelectbox"] [data-baseweb="select"] {
-    background: #ffffff !important;
-    border-radius: 10px !important;
-    min-height: 50px !important;
-}
-
+/* Area teks selectbox */
 div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
-    min-height: 44px !important;
-    padding: 10px 16px !important;
-    font-size: 1.1rem !important;
+    min-height: 42px !important;
+    padding: 8px 14px !important;
+    font-size: 1rem !important;
     font-weight: 600 !important;
     color: #0f172a !important;
     display: flex !important;
     align-items: center !important;
 }
 
-/* Dropdown menu options */
-div[data-testid="stSelectbox"] [data-baseweb="menu"] {
-    border-radius: 10px !important;
-    border: 1px solid rgba(15, 23, 42, 0.1) !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
-}
-
+/* Dropdown menu */
 div[data-testid="stSelectbox"] [data-baseweb="menu"] [data-baseweb="option"] {
-    padding: 12px 16px !important;
-    font-size: 1rem !important;
+    padding: 10px 14px !important;
+    font-size: 0.95rem !important;
     font-weight: 500 !important;
-    min-height: 48px !important;
-    display: flex !important;
-    align-items: center !important;
+    min-height: 42px !important;
 }
 
 /* ========== LICENSE PLATE CHIP ========== */
@@ -889,7 +876,7 @@ def login_page():
 
 # ============ DASHBOARD PAGE ============
 def dashboard_page():
-    section_header("Ringkasan Operasional", "📊 Dashboard", "Pantau performa rental hari ini secara langsung")
+    section_header("Ringkasan Operasional", " Dashboard", "Pantau performa rental hari ini secara langsung")
 
     today = datetime.now().strftime('%Y-%m-%d')
     trx_hari_ini = get_df("SELECT COUNT(*) c FROM transaksi WHERE tgl_sewa=?", (today,)).iloc[0]['c']
@@ -928,7 +915,7 @@ def dashboard_page():
     col1, col2 = st.columns(2)
 
     with col1:
-        glass_open(" Transaksi 7 Hari Terakhir")
+        glass_open("📈 Transaksi 7 Hari Terakhir")
         df_trx = get_df("""
             SELECT tgl_sewa, COUNT(*) as jumlah 
             FROM transaksi 
@@ -946,7 +933,7 @@ def dashboard_page():
         glass_close()
 
     with col2:
-        glass_open("️ Status Motor")
+        glass_open("🏍️ Status Motor")
         df_status = get_df("SELECT status, COUNT(*) as jumlah FROM motor GROUP BY status")
         if df_status.empty:
             st.info("Belum ada data motor.")
@@ -976,7 +963,7 @@ def dashboard_page():
         st.plotly_chart(fig, use_container_width=True)
     glass_close()
 
-    glass_open("📝 Transaksi Terbaru")
+    glass_open(" Transaksi Terbaru")
     df_recent = get_df("""
         SELECT t.id, p.nama, m.nopol, m.merek, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya, t.status
         FROM transaksi t
@@ -993,7 +980,7 @@ def dashboard_page():
 
 # ============ MOTOR PAGE ============
 def motor_page():
-    section_header("Armada", "🏍️ Manajemen Motor", "Kelola data, status, dan foto armada motor rental")
+    section_header("Armada", "️ Manajemen Motor", "Kelola data, status, dan foto armada motor rental")
 
     glass_open()
     col1, col2 = st.columns([2, 1])
@@ -1113,7 +1100,7 @@ def motor_page():
                     finally:
                         conn.close()
             with c2:
-                if st.button("️ Hapus Motor"):
+                if st.button("🗑️ Hapus Motor"):
                     conn = db.get_connection()
                     try:
                         conn.execute("DELETE FROM motor WHERE id=?", (int(motor['id']),))
@@ -1130,7 +1117,7 @@ def motor_page():
 
 # ============ PELANGGAN PAGE ============
 def pelanggan_page():
-    section_header("Database", " Manajemen Pelanggan", "Kelola data pelanggan rental")
+    section_header("Database", "👥 Manajemen Pelanggan", "Kelola data pelanggan rental")
 
     tab1, tab2 = st.tabs([" Daftar Pelanggan", "➕ Tambah Pelanggan"])
 
@@ -1180,7 +1167,7 @@ def pelanggan_page():
 def transaksi_page():
     section_header("Operasional", " Transaksi Penyewaan", "Buat transaksi sewa motor baru")
 
-    tab1, tab2, tab3 = st.tabs(["➕ Sewa Baru", "📤 Pengembalian", " Riwayat"])
+    tab1, tab2, tab3 = st.tabs(["➕ Sewa Baru", "📤 Pengembalian", "📋 Riwayat"])
 
     with tab1:
         pel_list = get_df("SELECT id, nama, ktp FROM pelanggan")
@@ -1351,7 +1338,7 @@ def laporan_page():
             <div class="value" style="font-size:1.2rem;">{format_rp(df['total_biaya'].mean() if len(df)>0 else 0)}</div>
         </div>
         <div class="stat-card green">
-            <h3>Motor Tersewa <span class="icon">️</span></h3>
+            <h3>Motor Tersewa <span class="icon">🏍️</span></h3>
             <div class="value">{df['motor_id'].nunique() if not df.empty else 0}</div>
         </div>
     </div>
@@ -1395,7 +1382,7 @@ def admin_page():
             <div class="value">{total_trx}</div>
         </div>
         <div class="stat-card orange">
-            <h3>Total Pelanggan <span class="icon">👥</span></h3>
+            <h3>Total Pelanggan <span class="icon"></span></h3>
             <div class="value">{total_pelanggan}</div>
         </div>
         <div class="stat-card purple">
@@ -1424,7 +1411,7 @@ def admin_page():
         glass_close()
 
     with col2:
-        glass_open("🏍️ Motor Terpopuler")
+        glass_open("️ Motor Terpopuler")
         df_pop = get_df("""
             SELECT m.merek, COUNT(*) as jumlah 
             FROM transaksi t JOIN motor m ON t.motor_id = m.id
@@ -1439,10 +1426,10 @@ def admin_page():
             st.plotly_chart(fig, use_container_width=True)
         glass_close()
 
-    glass_open("🔄 Status Sinkronisasi Cabang")
+    glass_open(" Status Sinkronisasi Cabang")
     sync_data = pd.DataFrame({
         'Cabang': ['Cabang Asoka', 'Cabang Pusat'],
-        'Status': ['🟢 Online', ' Online'],
+        'Status': ['🟢 Online', '🟢 Online'],
         'Last Sync': [datetime.now().strftime('%Y-%m-%d %H:%M'), 
                       (datetime.now() - timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M')],
         'Data Pending': [0, 2]
@@ -1450,7 +1437,7 @@ def admin_page():
     st.dataframe(sync_data, use_container_width=True, hide_index=True)
     glass_close()
 
-    glass_open(" Monitoring Motor Cabang")
+    glass_open("📷 Monitoring Motor Cabang")
     motor_df = get_df("SELECT id,nopol,merek,status,keterangan,foto FROM motor")
 
     if motor_df.empty:
@@ -1493,7 +1480,7 @@ def main():
         st.markdown(f"""
         <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
                     border-radius:12px; padding:0.8rem 1rem; margin-bottom:0.8rem;">
-            <div style="color:#FFFFFF; font-weight:700; font-size:0.95rem;">👤 {st.session_state.user['username']}</div>
+            <div style="color:#FFFFFF; font-weight:700; font-size:0.95rem;"> {st.session_state.user['username']}</div>
             <div style="color:#FFFFFF; opacity:0.85; font-size:0.8rem; margin-top:0.25rem;">🏷️ {st.session_state.user['role'].capitalize()}</div>
             <div style="color:#FFFFFF; opacity:0.85; font-size:0.8rem;">🏢 {st.session_state.user['cabang']}</div>
         </div>
@@ -1503,7 +1490,7 @@ def main():
         if st.session_state.user['role'] == 'admin':
             menu = st.radio("Menu", ["📊 Dashboard", "📈 Laporan", "🏢 Admin Pusat"], label_visibility="collapsed")
         else:
-            menu = st.radio("Menu", ["🏍️ Motor", "👥 Pelanggan", " Transaksi"], label_visibility="collapsed")
+            menu = st.radio("Menu", ["🏍️ Motor", "👥 Pelanggan", "🧾 Transaksi"], label_visibility="collapsed")
 
         st.markdown("---")
         
@@ -1528,7 +1515,7 @@ def main():
         if st.session_state.user['role'] == 'admin':
             admin_page()
         else:
-            st.error(" Akses ditolak! Hanya admin yang dapat mengakses halaman ini.")
+            st.error("❌ Akses ditolak! Hanya admin yang dapat mengakses halaman ini.")
 
 if __name__ == "__main__":
     main()
