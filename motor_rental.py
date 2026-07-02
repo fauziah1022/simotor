@@ -404,35 +404,45 @@ p, span, label, div {
     outline: none !important;
 }
 
-/* ========== SELECTBOX - PERKECIL KOTAK ========== */
-/* Perkecil lebar kotak selectbox Periode */
+/* ========== SELECTBOX - SAMAKAN UKURAN KOTAK ========== */
+/* Perkecil lebar container selectbox */
 div[data-testid="stSelectbox"] {
     margin-bottom: 1rem !important;
-    max-width: 220px !important;
+    max-width: 200px !important;
 }
 
-/* Container dalam selectbox */
+/* Samakan tinggi kotak teks "Harian" dengan kotak panah */
 div[data-testid="stSelectbox"] > div > div {
-    min-height: 48px !important;
+    min-height: 40px !important;
+    height: 40px !important;
 }
 
-/* Area teks selectbox */
+/* Area teks selectbox - KECILKAN */
 div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
-    min-height: 42px !important;
-    padding: 8px 14px !important;
-    font-size: 1rem !important;
-    font-weight: 600 !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    padding: 6px 12px !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
     color: #0f172a !important;
     display: flex !important;
     align-items: center !important;
 }
 
-/* Dropdown menu */
+/* Samakan ukuran kotak panah dropdown */
+div[data-testid="stSelectbox"] [data-baseweb="select"] > div:last-child {
+    min-height: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    width: 38px !important;
+}
+
+/* Dropdown menu options */
 div[data-testid="stSelectbox"] [data-baseweb="menu"] [data-baseweb="option"] {
-    padding: 10px 14px !important;
-    font-size: 0.95rem !important;
+    padding: 8px 12px !important;
+    font-size: 0.85rem !important;
     font-weight: 500 !important;
-    min-height: 42px !important;
+    min-height: 36px !important;
 }
 
 /* ========== LICENSE PLATE CHIP ========== */
@@ -847,7 +857,7 @@ def login_page():
     with col2:
         st.markdown("""
         <div class="login-shell">
-            <div class="login-logo-wrap">🏍️</div>
+            <div class="login-logo-wrap">️</div>
             <h2>SIMOTOR</h2>
             <p class="sub">Sistem Rental Motor Asoka &middot; Terdistribusi</p>
         </div>
@@ -876,7 +886,7 @@ def login_page():
 
 # ============ DASHBOARD PAGE ============
 def dashboard_page():
-    section_header("Ringkasan Operasional", " Dashboard", "Pantau performa rental hari ini secara langsung")
+    section_header("Ringkasan Operasional", "📊 Dashboard", "Pantau performa rental hari ini secara langsung")
 
     today = datetime.now().strftime('%Y-%m-%d')
     trx_hari_ini = get_df("SELECT COUNT(*) c FROM transaksi WHERE tgl_sewa=?", (today,)).iloc[0]['c']
@@ -963,7 +973,7 @@ def dashboard_page():
         st.plotly_chart(fig, use_container_width=True)
     glass_close()
 
-    glass_open(" Transaksi Terbaru")
+    glass_open("📝 Transaksi Terbaru")
     df_recent = get_df("""
         SELECT t.id, p.nama, m.nopol, m.merek, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya, t.status
         FROM transaksi t
@@ -980,7 +990,7 @@ def dashboard_page():
 
 # ============ MOTOR PAGE ============
 def motor_page():
-    section_header("Armada", "️ Manajemen Motor", "Kelola data, status, dan foto armada motor rental")
+    section_header("Armada", "🏍️ Manajemen Motor", "Kelola data, status, dan foto armada motor rental")
 
     glass_open()
     col1, col2 = st.columns([2, 1])
@@ -1065,7 +1075,7 @@ def motor_page():
         )
         glass_close()
 
-        glass_open("✏️ Edit / Hapus Motor")
+        glass_open("️ Edit / Hapus Motor")
         selected = st.selectbox("Pilih Motor", df['nopol'].tolist())
         if selected:
             motor = df[df['nopol']==selected].iloc[0]
@@ -1100,7 +1110,7 @@ def motor_page():
                     finally:
                         conn.close()
             with c2:
-                if st.button("🗑️ Hapus Motor"):
+                if st.button("️ Hapus Motor"):
                     conn = db.get_connection()
                     try:
                         conn.execute("DELETE FROM motor WHERE id=?", (int(motor['id']),))
@@ -1117,7 +1127,7 @@ def motor_page():
 
 # ============ PELANGGAN PAGE ============
 def pelanggan_page():
-    section_header("Database", "👥 Manajemen Pelanggan", "Kelola data pelanggan rental")
+    section_header("Database", " Manajemen Pelanggan", "Kelola data pelanggan rental")
 
     tab1, tab2 = st.tabs([" Daftar Pelanggan", "➕ Tambah Pelanggan"])
 
@@ -1287,7 +1297,7 @@ def transaksi_page():
 
 # ============ LAPORAN PAGE ============
 def laporan_page():
-    section_header("Insight", "📊 Laporan Cabang", "Laporan transaksi dan pendapatan per periode")
+    section_header("Insight", " Laporan Cabang", "Laporan transaksi dan pendapatan per periode")
 
     glass_open()
     c1, c2, c3 = st.columns(3)
@@ -1326,7 +1336,7 @@ def laporan_page():
     st.markdown(f"""
     <div class="stats-scroll-container">
         <div class="stat-card">
-            <h3>Total Transaksi <span class="icon">📋</span></h3>
+            <h3>Total Transaksi <span class="icon"></span></h3>
             <div class="value">{len(df)}</div>
         </div>
         <div class="stat-card purple">
@@ -1374,7 +1384,7 @@ def admin_page():
     st.markdown(f"""
     <div class="stats-scroll-container">
         <div class="stat-card">
-            <h3>Total Cabang <span class="icon">🏢</span></h3>
+            <h3>Total Cabang <span class="icon"></span></h3>
             <div class="value">{total_cabang}</div>
         </div>
         <div class="stat-card green">
@@ -1382,11 +1392,11 @@ def admin_page():
             <div class="value">{total_trx}</div>
         </div>
         <div class="stat-card orange">
-            <h3>Total Pelanggan <span class="icon"></span></h3>
+            <h3>Total Pelanggan <span class="icon">👥</span></h3>
             <div class="value">{total_pelanggan}</div>
         </div>
         <div class="stat-card purple">
-            <h3>Pendapatan <span class="icon">💰</span></h3>
+            <h3>Pendapatan <span class="icon"></span></h3>
             <div class="value" style="font-size:1.15rem;">{format_rp(total_pendapatan)}</div>
         </div>
     </div>
@@ -1411,7 +1421,7 @@ def admin_page():
         glass_close()
 
     with col2:
-        glass_open("️ Motor Terpopuler")
+        glass_open("🏍️ Motor Terpopuler")
         df_pop = get_df("""
             SELECT m.merek, COUNT(*) as jumlah 
             FROM transaksi t JOIN motor m ON t.motor_id = m.id
@@ -1480,7 +1490,7 @@ def main():
         st.markdown(f"""
         <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
                     border-radius:12px; padding:0.8rem 1rem; margin-bottom:0.8rem;">
-            <div style="color:#FFFFFF; font-weight:700; font-size:0.95rem;"> {st.session_state.user['username']}</div>
+            <div style="color:#FFFFFF; font-weight:700; font-size:0.95rem;">👤 {st.session_state.user['username']}</div>
             <div style="color:#FFFFFF; opacity:0.85; font-size:0.8rem; margin-top:0.25rem;">🏷️ {st.session_state.user['role'].capitalize()}</div>
             <div style="color:#FFFFFF; opacity:0.85; font-size:0.8rem;">🏢 {st.session_state.user['cabang']}</div>
         </div>
@@ -1515,7 +1525,7 @@ def main():
         if st.session_state.user['role'] == 'admin':
             admin_page()
         else:
-            st.error("❌ Akses ditolak! Hanya admin yang dapat mengakses halaman ini.")
+            st.error(" Akses ditolak! Hanya admin yang dapat mengakses halaman ini.")
 
 if __name__ == "__main__":
     main()
