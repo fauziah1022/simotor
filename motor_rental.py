@@ -229,18 +229,21 @@ p, span, label, div {
     gap: 0.5rem;
 }
 
-/* ---------- Stat Cards ---------- */
+/* ---------- Stat Cards - FIXED ---------- */
 .stat-card {
     position: relative;
     background: var(--surface);
     backdrop-filter: blur(16px);
-    padding: 1.5rem 1.6rem;
+    padding: 1.5rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-subtle);
     box-shadow: var(--shadow-md);
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
-    height: 100%;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .stat-card::before {
@@ -249,7 +252,6 @@ p, span, label, div {
     top: 0; left: 0; right: 0; 
     height: 4px;
     background: linear-gradient(90deg, var(--violet), var(--cyan));
-    opacity: 0.9;
 }
 
 .stat-card.green::before  { background: linear-gradient(90deg, var(--emerald), var(--cyan-soft)); }
@@ -259,42 +261,39 @@ p, span, label, div {
 
 .stat-card:hover {
     transform: translateY(-6px);
-    box-shadow: 
-        0 20px 48px rgba(99, 102, 241, 0.15),
-        0 8px 16px rgba(15, 23, 42, 0.08);
-    border-color: rgba(99, 102, 241, 0.2);
+    box-shadow: var(--shadow-xl);
 }
 
 .stat-card h3 {
-    font-size: 0.72rem; 
+    font-size: 0.78rem; 
     color: var(--slate); 
-    margin: 0 0 0.5rem 0;
+    margin: 0;
     text-transform: uppercase; 
-    letter-spacing: 0.08em; 
+    letter-spacing: 0.05em; 
     font-weight: 700;
     font-family: 'Inter', sans-serif !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
 }
 
 .stat-card .value {
-    font-size: 2rem; 
+    font-size: 2.2rem; 
     font-weight: 800; 
     color: var(--ink); 
-    margin: 0.4rem 0 0 0;
+    margin: 0.5rem 0 0 0;
     font-family: 'Manrope', sans-serif;
-    line-height: 1.1;
+    line-height: 1;
 }
 
 .stat-card .icon {
-    font-size: 1.8rem; 
-    float: right; 
-    opacity: 0.5;
-    filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.2));
-    transition: all 0.3s ease;
-}
-
-.stat-card:hover .icon {
-    opacity: 0.8;
-    transform: scale(1.1) rotate(-5deg);
+    font-size: 1.6rem; 
+    opacity: 0.6;
+    flex-shrink: 0;
 }
 
 /* ---------- License Plate Chip ---------- */
@@ -708,10 +707,6 @@ def format_rp(num):
     return f"Rp {int(num):,}".replace(",", ".")
 
 def get_df(query, params=None):
-    """Run a SELECT and return a DataFrame.
-    Always pass user-controlled values via `params` (parameterized query)
-    instead of string-formatting them into the SQL itself.
-    """
     conn = db.get_connection()
     try:
         df = pd.read_sql_query(query, conn, params=params)
@@ -720,7 +715,6 @@ def get_df(query, params=None):
     return df
 
 def plate_chip(status):
-    """Render the signature license-plate-style status chip."""
     status_key = str(status).lower().strip()
     label_map = {
         'tersedia': 'Tersedia', 'disewa': 'Disewa', 'rusak': 'Rusak',
@@ -793,7 +787,6 @@ def login_page():
 def dashboard_page():
     section_header("Ringkasan Operasional", "📊 Dashboard", "Pantau performa rental hari ini secara langsung")
 
-    # Stats
     today = datetime.now().strftime('%Y-%m-%d')
     trx_hari_ini = get_df("SELECT COUNT(*) c FROM transaksi WHERE tgl_sewa=?", (today,)).iloc[0]['c']
     motor_tersedia = get_df("SELECT COUNT(*) c FROM motor WHERE status='tersedia'").iloc[0]['c']
@@ -804,38 +797,32 @@ def dashboard_page():
     c1, c2, c3, c4, c5 = st.columns(5)
     with c1:
         st.markdown(f"""<div class="stat-card">
-            <span class="icon">📋</span>
-            <h3>Transaksi Hari Ini</h3>
+            <h3>Transaksi Hari Ini <span class="icon">📋</span></h3>
             <div class="value">{trx_hari_ini}</div>
         </div>""", unsafe_allow_html=True)
     with c2:
         st.markdown(f"""<div class="stat-card green">
-            <span class="icon">✅</span>
-            <h3>Motor Tersedia</h3>
+            <h3>Motor Tersedia <span class="icon">✅</span></h3>
             <div class="value">{motor_tersedia}</div>
         </div>""", unsafe_allow_html=True)
     with c3:
         st.markdown(f"""<div class="stat-card orange">
-            <span class="icon">🏍️</span>
-            <h3>Motor Disewa</h3>
+            <h3>Motor Disewa <span class="icon">🏍️</span></h3>
             <div class="value">{motor_disewa}</div>
         </div>""", unsafe_allow_html=True)
     with c4:
         st.markdown(f"""<div class="stat-card purple">
-            <span class="icon">💰</span>
-            <h3>Total Pendapatan</h3>
-            <div class="value" style="font-size:1.25rem;">{format_rp(pendapatan)}</div>
+            <h3>Pendapatan <span class="icon">💰</span></h3>
+            <div class="value" style="font-size:1.4rem;">{format_rp(pendapatan)}</div>
         </div>""", unsafe_allow_html=True)
     with c5:
         st.markdown(f"""<div class="stat-card red">
-            <span class="icon">👥</span>
-            <h3>Total Pelanggan</h3>
+            <h3>Pelanggan <span class="icon">👥</span></h3>
             <div class="value">{total_pelanggan}</div>
         </div>""", unsafe_allow_html=True)
 
     st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
 
-    # Charts
     col1, col2 = st.columns(2)
 
     with col1:
@@ -870,7 +857,6 @@ def dashboard_page():
             st.plotly_chart(fig, use_container_width=True)
         glass_close()
 
-    # Pendapatan 30 hari
     glass_open("💵 Pendapatan 30 Hari Terakhir")
     df_pendapatan = get_df("""
         SELECT tgl_kembali as tanggal, SUM(total_bayar) as pendapatan
@@ -888,7 +874,6 @@ def dashboard_page():
         st.plotly_chart(fig, use_container_width=True)
     glass_close()
 
-    # Transaksi terbaru
     glass_open("📝 Transaksi Terbaru")
     df_recent = get_df("""
         SELECT t.id, p.nama, m.nopol, m.merek, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya, t.status
@@ -916,9 +901,6 @@ def motor_page():
         filter_status = st.selectbox("Filter Status", ["semua","tersedia","disewa","rusak","servis"])
     glass_close()
 
-    # Build query with parameter placeholders instead of string-formatting
-    # user input directly into SQL (prevents SQL injection and avoids
-    # crashing on values containing a single quote, e.g. an apostrophe).
     query = "SELECT * FROM motor WHERE 1=1"
     params = []
     if search:
@@ -946,14 +928,8 @@ def motor_page():
                 tarif_jam = st.number_input("Tarif/Jam", min_value=0, value=10000)
                 tarif_hari = st.number_input("Tarif/Hari", min_value=0, value=80000)
                 status = st.selectbox("Status", ["tersedia","disewa","rusak","servis"])
-                foto = st.file_uploader(
-                    "📷 Upload Foto Motor",
-                    type=["jpg","jpeg","png"]
-                )
-
-                keterangan = st.text_area(
-                    "📝 Keterangan Motor"
-                )
+                foto = st.file_uploader("📷 Upload Foto Motor", type=["jpg","jpeg","png"])
+                keterangan = st.text_area("📝 Keterangan Motor")
 
             col_a, col_b = st.columns(2)
             with col_a:
@@ -962,23 +938,12 @@ def motor_page():
                         conn = db.get_connection()
                         try:
                             foto_data = foto.read() if foto else None
-
                             conn.execute("""
                             INSERT INTO motor
                             (nopol,merek,jenis,tarif_jam,tarif_hari,status,cabang,foto,keterangan)
                             VALUES (?,?,?,?,?,?,?,?,?)
                             """,
-                            (
-                                nopol,
-                                merek,
-                                jenis,
-                                tarif_jam,
-                                tarif_hari,
-                                status,
-                                'Cabang Asoka',
-                                foto_data,
-                                keterangan
-                            ))
+                            (nopol, merek, jenis, tarif_jam, tarif_hari, status, 'Cabang Asoka', foto_data, keterangan))
                             conn.commit()
                             st.success("✅ Motor berhasil ditambahkan!")
                             st.session_state.show_motor_form = False
@@ -995,7 +960,6 @@ def motor_page():
                     st.rerun()
         glass_close()
 
-    # Display table with status badge
     if not df.empty:
         glass_open(f"Daftar Motor ({len(df)})")
         df_display = df[['nopol','merek','jenis','tarif_jam','tarif_hari','status']].copy()
@@ -1012,7 +976,6 @@ def motor_page():
         )
         glass_close()
 
-        # Edit/Delete
         glass_open("✏️ Edit / Hapus Motor")
         selected = st.selectbox("Pilih Motor", df['nopol'].tolist())
         if selected:
@@ -1021,56 +984,25 @@ def motor_page():
             st.write("")
 
             if 'foto' in motor.index and motor['foto'] is not None:
-                st.image(
-                    bytes(motor['foto']),
-                    width=250,
-                    caption=motor['nopol']
-                )
+                st.image(bytes(motor['foto']), width=250, caption=motor['nopol'])
+            
             c1, c2, c3 = st.columns(3)
             with c1:
-                new_status = st.selectbox(
-                    "Ubah Status",
-                    ["tersedia","disewa","rusak","servis"],
-                    index=["tersedia","disewa","rusak","servis"].index(motor['status'])
-                )
-
-                new_foto = st.file_uploader(
-                    "📷 Ganti Foto Motor",
-                    type=["jpg","jpeg","png"],
-                    key="edit_foto"
-                )
-
-                new_keterangan = st.text_area(
-                    "📝 Keterangan Motor",
-                    value=motor['keterangan'] if ('keterangan' in motor.index and motor['keterangan'] is not None) else ""
-                )
+                new_status = st.selectbox("Ubah Status", ["tersedia","disewa","rusak","servis"],
+                    index=["tersedia","disewa","rusak","servis"].index(motor['status']))
+                new_foto = st.file_uploader("📷 Ganti Foto Motor", type=["jpg","jpeg","png"], key="edit_foto")
+                new_keterangan = st.text_area("📝 Keterangan Motor",
+                    value=motor['keterangan'] if ('keterangan' in motor.index and motor['keterangan'] is not None) else "")
                 if st.button("💾 Update Motor"):
                     conn = db.get_connection()
                     try:
                         if new_foto:
                             foto_data = new_foto.read()
-                            conn.execute("""
-                            UPDATE motor
-                            SET status=?, foto=?, keterangan=?
-                            WHERE id=?
-                            """,
-                            (
-                                new_status,
-                                foto_data,
-                                new_keterangan,
-                                int(motor['id'])
-                            ))
+                            conn.execute("UPDATE motor SET status=?, foto=?, keterangan=? WHERE id=?",
+                                (new_status, foto_data, new_keterangan, int(motor['id'])))
                         else:
-                            conn.execute("""
-                            UPDATE motor
-                            SET status=?, keterangan=?
-                            WHERE id=?
-                            """,
-                            (
-                                new_status,
-                                new_keterangan,
-                                int(motor['id'])
-                            ))
+                            conn.execute("UPDATE motor SET status=?, keterangan=? WHERE id=?",
+                                (new_status, new_keterangan, int(motor['id'])))
                         conn.commit()
                         st.success("✅ Data motor berhasil diperbarui!")
                         st.rerun()
@@ -1160,32 +1092,17 @@ def transaksi_page():
         with st.form("trx_form"):
             c1, c2 = st.columns(2)
             with c1:
-                # Use format_func so the selectbox displays a friendly label
-                # while keeping the underlying value as the actual row id.
-                pel_choice_id = st.selectbox(
-                    "Pilih Pelanggan",
-                    pel_list['id'].tolist(),
-                    format_func=lambda pid: (
-                        f"{pel_list.loc[pel_list['id']==pid, 'nama'].values[0]} "
-                        f"({pel_list.loc[pel_list['id']==pid, 'ktp'].values[0]})"
-                    )
-                )
+                pel_choice_id = st.selectbox("Pilih Pelanggan", pel_list['id'].tolist(),
+                    format_func=lambda pid: f"{pel_list.loc[pel_list['id']==pid, 'nama'].values[0]} ({pel_list.loc[pel_list['id']==pid, 'ktp'].values[0]})")
                 pel_id = int(pel_choice_id)
 
-                motor_choice_id = st.selectbox(
-                    "Pilih Motor",
-                    motor_list['id'].tolist(),
-                    format_func=lambda mid: (
-                        f"{motor_list.loc[motor_list['id']==mid, 'nopol'].values[0]} - "
-                        f"{motor_list.loc[motor_list['id']==mid, 'merek'].values[0]}"
-                    )
-                )
+                motor_choice_id = st.selectbox("Pilih Motor", motor_list['id'].tolist(),
+                    format_func=lambda mid: f"{motor_list.loc[motor_list['id']==mid, 'nopol'].values[0]} - {motor_list.loc[motor_list['id']==mid, 'merek'].values[0]}")
                 motor_row = motor_list[motor_list['id'] == motor_choice_id].iloc[0]
                 motor_sel = f"{motor_row['nopol']} - {motor_row['merek']}"
             with c2:
                 durasi = st.number_input("Durasi", min_value=1, value=1)
                 satuan = st.selectbox("Satuan", ["hari","jam"])
-
                 tarif = motor_row['tarif_hari'] if satuan == 'hari' else motor_row['tarif_jam']
                 total = tarif * durasi
                 st.metric("💰 Total Biaya", format_rp(total))
@@ -1201,7 +1118,6 @@ def transaksi_page():
                     conn.commit()
                     st.success("✅ Transaksi berhasil disimpan!")
 
-                    # Struk
                     st.markdown(f"""
                     <div class="struk-card">
                         <h3>🧾 STRUK SEWA MOTOR</h3>
@@ -1222,16 +1138,7 @@ def transaksi_page():
 
     with tab2:
         trx_aktif = get_df("""
-            SELECT
-                t.id,
-                t.motor_id,
-                p.nama,
-                m.nopol,
-                m.merek,
-                t.tgl_sewa,
-                t.durasi,
-                t.satuan,
-                t.total_biaya
+            SELECT t.id, t.motor_id, p.nama, m.nopol, m.merek, t.tgl_sewa, t.durasi, t.satuan, t.total_biaya
             FROM transaksi t
             JOIN pelanggan p ON t.pelanggan_id = p.id
             JOIN motor m ON t.motor_id = m.id
@@ -1330,19 +1237,23 @@ def laporan_page():
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown(f"""<div class="stat-card">
-            <h3>Total Transaksi</h3><div class="value">{len(df)}</div>
+            <h3>Total Transaksi <span class="icon">📊</span></h3>
+            <div class="value">{len(df)}</div>
         </div>""", unsafe_allow_html=True)
     with c2:
         st.markdown(f"""<div class="stat-card purple">
-            <h3>Total Pendapatan</h3><div class="value" style="font-size:1.25rem;">{format_rp(df['total_biaya'].sum() if len(df) > 0 else 0)}</div>
+            <h3>Pendapatan <span class="icon">💰</span></h3>
+            <div class="value" style="font-size:1.2rem;">{format_rp(df['total_biaya'].sum() if len(df) > 0 else 0)}</div>
         </div>""", unsafe_allow_html=True)
     with c3:
         st.markdown(f"""<div class="stat-card orange">
-            <h3>Rata-rata/Transaksi</h3><div class="value" style="font-size:1.25rem;">{format_rp(df['total_biaya'].mean() if len(df)>0 else 0)}</div>
+            <h3>Rata-rata <span class="icon">📈</span></h3>
+            <div class="value" style="font-size:1.2rem;">{format_rp(df['total_biaya'].mean() if len(df)>0 else 0)}</div>
         </div>""", unsafe_allow_html=True)
     with c4:
         st.markdown(f"""<div class="stat-card green">
-            <h3>Motor Tersewa</h3><div class="value">{df['motor_id'].nunique() if not df.empty else 0}</div>
+            <h3>Motor Tersewa <span class="icon">🏍️</span></h3>
+            <div class="value">{df['motor_id'].nunique() if not df.empty else 0}</div>
         </div>""", unsafe_allow_html=True)
 
     st.write("")
@@ -1367,7 +1278,7 @@ def laporan_page():
 def admin_page():
     section_header("Pusat Kendali", "🏢 Dashboard Admin Pusat", "Monitoring seluruh cabang rental motor")
 
-    total_cabang = 1  # Simplified
+    total_cabang = 1
     total_trx = get_df("SELECT COUNT(*) c FROM transaksi").iloc[0]['c']
     total_pelanggan = get_df("SELECT COUNT(*) c FROM pelanggan").iloc[0]['c']
     total_pendapatan = get_df("SELECT COALESCE(SUM(total_bayar),0) t FROM pengembalian").iloc[0]['t']
@@ -1375,19 +1286,23 @@ def admin_page():
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown(f"""<div class="stat-card">
-            <h3>Total Cabang</h3><div class="value">{total_cabang}</div>
+            <h3>Total Cabang <span class="icon">🏢</span></h3>
+            <div class="value">{total_cabang}</div>
         </div>""", unsafe_allow_html=True)
     with c2:
         st.markdown(f"""<div class="stat-card green">
-            <h3>Total Transaksi</h3><div class="value">{total_trx}</div>
+            <h3>Total Transaksi <span class="icon">📋</span></h3>
+            <div class="value">{total_trx}</div>
         </div>""", unsafe_allow_html=True)
     with c3:
         st.markdown(f"""<div class="stat-card orange">
-            <h3>Total Pelanggan</h3><div class="value">{total_pelanggan}</div>
+            <h3>Total Pelanggan <span class="icon">👥</span></h3>
+            <div class="value">{total_pelanggan}</div>
         </div>""", unsafe_allow_html=True)
     with c4:
         st.markdown(f"""<div class="stat-card purple">
-            <h3>Total Pendapatan</h3><div class="value" style="font-size:1.15rem;">{format_rp(total_pendapatan)}</div>
+            <h3>Pendapatan <span class="icon">💰</span></h3>
+            <div class="value" style="font-size:1.15rem;">{format_rp(total_pendapatan)}</div>
         </div>""", unsafe_allow_html=True)
 
     st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
@@ -1424,7 +1339,6 @@ def admin_page():
             st.plotly_chart(fig, use_container_width=True)
         glass_close()
 
-    # Monitoring Sync
     glass_open("🔄 Status Sinkronisasi Cabang")
     sync_data = pd.DataFrame({
         'Cabang': ['Cabang Asoka', 'Cabang Pusat'],
@@ -1437,40 +1351,25 @@ def admin_page():
     glass_close()
 
     glass_open("📷 Monitoring Motor Cabang")
-    motor_df = get_df("""
-        SELECT id,nopol,merek,status,keterangan,foto
-        FROM motor
-    """)
+    motor_df = get_df("SELECT id,nopol,merek,status,keterangan,foto FROM motor")
 
     if motor_df.empty:
         st.info("Belum ada data motor.")
     else:
         for idx, row in motor_df.iterrows():
             col1, col2 = st.columns([1,2])
-
             with col1:
                 if row["foto"] is not None:
-                    st.image(
-                        bytes(row["foto"]),
-                        width=220,
-                        caption=row["nopol"]
-                    )
+                    st.image(bytes(row["foto"]), width=220, caption=row["nopol"])
                 else:
                     st.markdown("*Tidak ada foto*")
-
             with col2:
                 st.write(f"**Motor:** {row['merek']}")
                 st.markdown(plate_chip(row['status']), unsafe_allow_html=True)
                 st.write(f"**Keterangan:** {row['keterangan'] if row['keterangan'] else '-'}")
-
                 if row["foto"] is not None:
-                    st.download_button(
-                        "⬇️ Download Foto",
-                        data=bytes(row["foto"]),
-                        file_name=f"{row['nopol']}.jpg",
-                        mime="image/jpeg",
-                        key=f"dl_{row['id']}"
-                    )
+                    st.download_button("⬇️ Download Foto", data=bytes(row["foto"]),
+                        file_name=f"{row['nopol']}.jpg", mime="image/jpeg", key=f"dl_{row['id']}")
             if idx < len(motor_df) - 1:
                 st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
     glass_close()
@@ -1481,7 +1380,6 @@ def main():
         login_page()
         return
 
-    # Sidebar Navigation
     with st.sidebar:
         st.markdown("""
         <div style="text-align:center; padding:1.2rem 0 0.6rem;">
@@ -1503,19 +1401,9 @@ def main():
         st.markdown("---")
 
         if st.session_state.user['role'] == 'admin':
-            menu = st.radio(
-                "📋 Menu",
-                ["📊 Dashboard",
-                "📈 Laporan", "🏢 Admin Pusat"],
-                label_visibility="collapsed"
-            )
+            menu = st.radio("📋 Menu", ["📊 Dashboard", "📈 Laporan", "🏢 Admin Pusat"], label_visibility="collapsed")
         else:
-            menu = st.radio(
-                "📋 Menu",
-                ["🏍️ Motor", "👥 Pelanggan",
-                "🧾 Transaksi"],
-                label_visibility="collapsed"
-            )
+            menu = st.radio("📋 Menu", ["🏍️ Motor", "👥 Pelanggan", "🧾 Transaksi"], label_visibility="collapsed")
 
         st.markdown("---")
         if st.button("🚪 Logout", use_container_width=True):
@@ -1529,7 +1417,6 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
-    # Route pages
     if "Dashboard" in menu: dashboard_page()
     elif "Motor" in menu: motor_page()
     elif "Pelanggan" in menu: pelanggan_page()
