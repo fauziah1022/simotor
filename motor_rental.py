@@ -823,9 +823,7 @@ def login_page():
 
         with st.form("login_form"):
             username = st.text_input("Username", placeholder="Masukkan username")
-            st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
             password = st.text_input("Password", type="password", placeholder="••••••••")
-            st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
             submitted = st.form_submit_button("Masuk ke Dashboard →", use_container_width=True)
 
             if submitted:
