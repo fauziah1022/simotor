@@ -811,6 +811,14 @@ PLOTLY_LAYOUT = dict(
 
 # ============ LOGIN PAGE ============
 def login_page():
+    # Tambahkan CSS untuk rapatkan form
+    st.markdown("""
+    <style>
+    [data-testid="stForm"] .stTextInput { margin-bottom: 0.2rem !important; }
+    .stTextInput > div { margin-bottom: 0.1rem !important; }
+    </style>
+    """, unsafe_allow_html=True)
+    
     col1, col2, col3 = st.columns([1, 1.3, 1])
     with col2:
         st.markdown("""
