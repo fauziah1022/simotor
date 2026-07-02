@@ -133,6 +133,7 @@ p, span, label, div {
 }
 
 /* ========== LOGOUT BUTTON - SIDEBAR ========== */
+/* Tombol logout dengan background merah gelap */
 [data-testid="stSidebar"] .stButton > button {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
     color: #ffffff !important;
@@ -148,12 +149,14 @@ p, span, label, div {
     letter-spacing: 0.3px !important;
 }
 
+/* Hover: lebih terang */
 [data-testid="stSidebar"] .stButton > button:hover {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
     box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4) !important;
     transform: translateY(-2px) !important;
 }
 
+/* Active */
 [data-testid="stSidebar"] .stButton > button:active {
     background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%) !important;
     transform: translateY(0) !important;
@@ -402,38 +405,6 @@ p, span, label, div {
         0 0 0 4px rgba(99, 102, 241, 0.12),
         0 4px 12px rgba(99, 102, 241, 0.1) !important;
     outline: none !important;
-}
-
-/* ========== SELECTBOX - PERBESAR & PERJELAS TEKS ========== */
-/* Perbesar container selectbox */
-div[data-testid="stSelectbox"] {
-    margin-bottom: 1rem !important;
-}
-
-/* Perbesar tinggi dan padding selectbox */
-div[data-testid="stSelectbox"] > div > div {
-    min-height: 56px !important;
-    padding: 8px 12px !important;
-}
-
-/* Perbesar font size teks di dalam selectbox */
-div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
-    font-size: 1.1rem !important;
-    font-weight: 600 !important;
-    color: #0f172a !important;
-    min-height: 40px !important;
-    display: flex !important;
-    align-items: center !important;
-}
-
-/* Perbesar dropdown menu options */
-div[data-testid="stSelectbox"] [data-baseweb="menu"] [data-baseweb="option"] {
-    padding: 12px 16px !important;
-    font-size: 1rem !important;
-    font-weight: 500 !important;
-    min-height: 48px !important;
-    display: flex !important;
-    align-items: center !important;
 }
 
 /* ========== LICENSE PLATE CHIP ========== */
@@ -1003,7 +974,7 @@ def motor_page():
 
     df = get_df(query, tuple(params) if params else None)
 
-    if st.button(" Tambah Motor Baru"):
+    if st.button("➕ Tambah Motor Baru"):
         st.session_state.show_motor_form = True
 
     if st.session_state.get('show_motor_form'):
@@ -1101,7 +1072,7 @@ def motor_page():
                     finally:
                         conn.close()
             with c2:
-                if st.button("️ Hapus Motor"):
+                if st.button("🗑️ Hapus Motor"):
                     conn = db.get_connection()
                     try:
                         conn.execute("DELETE FROM motor WHERE id=?", (int(motor['id']),))
@@ -1379,7 +1350,7 @@ def admin_page():
             <div class="value">{total_cabang}</div>
         </div>
         <div class="stat-card green">
-            <h3>Total Transaksi <span class="icon"></span></h3>
+            <h3>Total Transaksi <span class="icon">📋</span></h3>
             <div class="value">{total_trx}</div>
         </div>
         <div class="stat-card orange">
@@ -1430,7 +1401,7 @@ def admin_page():
     glass_open(" Status Sinkronisasi Cabang")
     sync_data = pd.DataFrame({
         'Cabang': ['Cabang Asoka', 'Cabang Pusat'],
-        'Status': ['🟢 Online', ' Online'],
+        'Status': ['🟢 Online', '🟢 Online'],
         'Last Sync': [datetime.now().strftime('%Y-%m-%d %H:%M'), 
                       (datetime.now() - timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M')],
         'Data Pending': [0, 2]
