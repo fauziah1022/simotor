@@ -826,7 +826,7 @@ def login_page():
         """, unsafe_allow_html=True)
 
         with st.form("login_form"):
-            username = st.text_input("Username", placeholder="cth. admin")
+            username = st.text_input("Username", placeholder="Masukkan username")
             password = st.text_input("Password", type="password", placeholder="••••••••")
             submitted = st.form_submit_button("Masuk ke Dashboard →", use_container_width=True)
 
