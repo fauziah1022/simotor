@@ -132,13 +132,12 @@ p, span, label, div {
     color: white !important;
 }
 
-/* ========== LOGOUT BUTTON - SIDEBAR (FIXED) ========== */
-/* Target tombol logout di sidebar */
-[data-testid="stSidebar"] button[kind="secondary"],
-[data-testid="stSidebar"] .stButton button {
-    background: rgba(255, 255, 255, 0.1) !important;
+/* ========== LOGOUT BUTTON - SIDEBAR ========== */
+/* Tombol logout dengan background merah gelap */
+[data-testid="stSidebar"] .stButton > button {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
     color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border: none !important;
     border-radius: 10px !important;
     padding: 12px 20px !important;
     font-weight: 600 !important;
@@ -146,27 +145,22 @@ p, span, label, div {
     font-family: 'Inter', sans-serif !important;
     transition: all 0.3s ease !important;
     width: 100% !important;
-    box-shadow: none !important;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3) !important;
     letter-spacing: 0.3px !important;
 }
 
-/* Hover: merah */
-[data-testid="stSidebar"] button[kind="secondary"]:hover,
-[data-testid="stSidebar"] .stButton button:hover {
+/* Hover: lebih terang */
+[data-testid="stSidebar"] .stButton > button:hover {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-    color: #ffffff !important;
-    border-color: transparent !important;
-    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4) !important;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4) !important;
     transform: translateY(-2px) !important;
 }
 
 /* Active */
-[data-testid="stSidebar"] button[kind="secondary"]:active,
-[data-testid="stSidebar"] .stButton button:active {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
-    color: #ffffff !important;
+[data-testid="stSidebar"] .stButton > button:active {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%) !important;
     transform: translateY(0) !important;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3) !important;
 }
 
 /* ========== HEADER BANNER ========== */
@@ -369,16 +363,13 @@ p, span, label, div {
     flex-shrink: 0;
 }
 
-/* ========== FORM LABELS - SUPER VISIBLE ========== */
+/* ========== FORM LABELS ========== */
 .stTextInput label,
 .stNumberInput label,
 .stSelectbox label,
 .stTextArea label,
 .stDateInput label,
-.stFileUploader label,
-div[data-testid="stWidget"] > label,
-div[data-testid="stWidget"] > div > label,
-div[data-testid="stWidget"] > div > div > label {
+.stFileUploader label {
     color: #0f172a !important;
     font-weight: 800 !important;
     font-size: 0.82rem !important;
@@ -386,7 +377,6 @@ div[data-testid="stWidget"] > div > div > label {
     letter-spacing: 0.08em !important;
     margin-bottom: 0.6rem !important;
     display: block !important;
-    text-shadow: 0 1px 2px rgba(255,255,255,0.9) !important;
 }
 
 /* ========== FORM INPUTS ========== */
@@ -400,7 +390,7 @@ div[data-testid="stWidget"] > div > div > label {
     border-radius: var(--radius-sm) !important;
     padding: 0.75rem 1rem !important;
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.9rem !important;
+    font-size: 0.95rem !important;
     transition: all 0.2s ease !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
 }
@@ -415,60 +405,6 @@ div[data-testid="stWidget"] > div > div > label {
         0 0 0 4px rgba(99, 102, 241, 0.12),
         0 4px 12px rgba(99, 102, 241, 0.1) !important;
     outline: none !important;
-}
-
-/* ========== FIX DROPDOWN SELECTBOX - TEKS TIDAK TERPOTONG ========== */
-/* Perbaiki selectbox PERIODE */
-[data-testid="stSelectbox"] {
-    margin-bottom: 0 !important;
-}
-
-[data-testid="stSelectbox"] > div {
-    min-height: 50px !important;
-}
-
-[data-testid="stSelectbox"] [data-baseweb="select"] {
-    min-height: 50px !important;
-    background: white !important;
-    border: 2px solid rgba(15, 23, 42, 0.12) !important;
-    border-radius: 12px !important;
-}
-
-[data-testid="stSelectbox"] [data-baseweb="select"] > div {
-    min-height: 48px !important;
-    padding: 12px 16px !important;
-}
-
-[data-testid="stSelectbox"] [data-baseweb="select"] [data-baseweb="input"] {
-    font-size: 16px !important;
-    font-weight: 500 !important;
-    color: #0f172a !important;
-    padding: 0 !important;
-    min-height: 24px !important;
-    line-height: 1.5 !important;
-    white-space: nowrap !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-}
-
-[data-testid="stSelectbox"] [data-baseweb="select"] [data-baseweb="placeholder"] {
-    font-size: 16px !important;
-    color: #64748b !important;
-}
-
-/* Dropdown menu */
-[data-testid="stSelectbox"] [data-baseweb="menu"] {
-    max-height: 300px !important;
-    border-radius: 12px !important;
-    border: 1px solid rgba(15, 23, 42, 0.1) !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
-}
-
-[data-testid="stSelectbox"] [data-baseweb="menu"] [data-baseweb="option"] {
-    padding: 12px 16px !important;
-    min-height: 44px !important;
-    font-size: 15px !important;
-    font-weight: 500 !important;
 }
 
 /* ========== LICENSE PLATE CHIP ========== */
@@ -571,20 +507,6 @@ div[data-testid="stWidget"] > div > div > label {
     box-shadow: 
         0 2px 8px rgba(99, 102, 241, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Secondary buttons */
-.stButton > button[kind="secondary"] {
-    background: var(--surface) !important;
-    color: var(--ink) !important;
-    border: 1.5px solid var(--border-subtle) !important;
-    box-shadow: var(--shadow-sm) !important;
-}
-
-.stButton > button[kind="secondary"]:hover {
-    border-color: var(--violet) !important;
-    color: var(--violet) !important;
-    background: rgba(99, 102, 241, 0.04) !important;
 }
 
 /* ========== LOGIN BOX ========== */
@@ -1544,8 +1466,8 @@ def main():
 
         st.markdown("---")
         
-        # Logout button
-        if st.button("🚪 Logout", use_container_width=True, key="logout_btn"):
+        # Logout button - TANPA ICON PINTU
+        if st.button("Logout", use_container_width=True, key="logout_btn"):
             st.session_state.logged_in = False
             st.session_state.user = None
             st.rerun()
