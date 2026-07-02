@@ -75,7 +75,7 @@ p, span, label, div {
     font-family: 'Inter', sans-serif !important;
 }
 
-/* ---------- Sidebar: Premium Dark Glass ---------- */
+/* ========== SIDEBAR ========== */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
     border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
@@ -103,7 +103,6 @@ p, span, label, div {
     margin: 1rem 0 !important;
 }
 
-/* Sidebar radio nav */
 [data-testid="stSidebar"] [role="radiogroup"] {
     gap: 6px !important;
 }
@@ -133,43 +132,41 @@ p, span, label, div {
     color: white !important;
 }
 
-/* ---------- Logout Button (Sidebar) ---------- */
-.logout-wrapper {
-    margin-top: 0.5rem;
-}
-
-.logout-wrapper button {
-    background: rgba(244, 63, 94, 0.08) !important;
-    color: #fda4af !important;
-    border: 1.5px solid rgba(244, 63, 94, 0.25) !important;
-    border-radius: var(--radius-md) !important;
-    padding: 0.7rem 1.2rem !important;
-    font-weight: 600 !important;
+/* ========== LOGOUT BUTTON - SIDEBAR ========== */
+/* Default: merah muda transparan (kelihatan di sidebar gelap) */
+[data-testid="stSidebar"] .stButton > button {
+    background: rgba(239, 68, 68, 0.12) !important;
+    color: #fca5a5 !important;
+    border: 2px solid rgba(239, 68, 68, 0.35) !important;
+    border-radius: 12px !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.9rem !important;
-    box-shadow: none !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     width: 100% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.5rem !important;
+    box-shadow: none !important;
+    letter-spacing: 0.02em !important;
 }
 
-.logout-wrapper button:hover {
+/* Hover: merah penuh */
+[data-testid="stSidebar"] .stButton > button:hover {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-    color: white !important;
+    color: #ffffff !important;
     border-color: transparent !important;
-    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4) !important;
-    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 28px rgba(239, 68, 68, 0.5) !important;
+    transform: translateY(-3px) scale(1.02) !important;
 }
 
-.logout-wrapper button:active {
-    transform: translateY(0) !important;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+/* Active */
+[data-testid="stSidebar"] .stButton > button:active {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) scale(1) !important;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4) !important;
 }
 
-/* ---------- Header Banner ---------- */
+/* ========== HEADER BANNER ========== */
 .main-header {
     position: relative;
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 40%, #06b6d4 100%);
@@ -235,7 +232,7 @@ p, span, label, div {
     font-weight: 600;
 }
 
-/* ---------- Glass Panels ---------- */
+/* ========== GLASS PANELS ========== */
 .glass-panel {
     background: var(--surface-glass);
     backdrop-filter: blur(20px) saturate(180%);
@@ -266,7 +263,7 @@ p, span, label, div {
     gap: 0.5rem;
 }
 
-/* ---------- Scrollable Stats Container ---------- */
+/* ========== SCROLLABLE STATS CONTAINER ========== */
 .stats-scroll-container {
     display: flex;
     gap: 1.2rem;
@@ -298,7 +295,7 @@ p, span, label, div {
     background: linear-gradient(90deg, var(--violet-dark), var(--cyan-soft));
 }
 
-/* ---------- Stat Cards ---------- */
+/* ========== STAT CARDS ========== */
 .stat-card {
     position: relative;
     background: var(--surface);
@@ -369,7 +366,56 @@ p, span, label, div {
     flex-shrink: 0;
 }
 
-/* ---------- License Plate Chip ---------- */
+/* ========== FORM LABELS - SUPER VISIBLE ========== */
+/* Target semua label form agar terlihat jelas */
+.stTextInput label,
+.stNumberInput label,
+.stSelectbox label,
+.stTextArea label,
+.stDateInput label,
+.stFileUploader label,
+div[data-testid="stWidget"] > label,
+div[data-testid="stWidget"] > div > label,
+div[data-testid="stWidget"] > div > div > label {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+    font-size: 0.82rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    margin-bottom: 0.6rem !important;
+    display: block !important;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.9) !important;
+}
+
+/* ========== FORM INPUTS ========== */
+.stTextInput > div > div > input,
+.stNumberInput > div > div > input,
+.stSelectbox > div > div > div,
+.stTextArea > div > div > textarea,
+.stDateInput > div > div > input {
+    background: var(--surface) !important;
+    border: 2px solid rgba(15, 23, 42, 0.12) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 0.75rem 1rem !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.9rem !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+}
+
+.stTextInput > div > div > input:focus,
+.stNumberInput > div > div > input:focus,
+.stSelectbox > div > div > div:focus-within,
+.stTextArea > div > div > textarea:focus,
+.stDateInput > div > div > input:focus {
+    border-color: var(--violet) !important;
+    box-shadow: 
+        0 0 0 4px rgba(99, 102, 241, 0.12),
+        0 4px 12px rgba(99, 102, 241, 0.1) !important;
+    outline: none !important;
+}
+
+/* ========== LICENSE PLATE CHIP ========== */
 .plate-chip {
     display: inline-flex;
     align-items: center;
@@ -404,7 +450,7 @@ p, span, label, div {
 .plate-aktif    { color: #6366f1; background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.3); }
 .plate-selesai  { color: #059669; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); }
 
-/* ---------- Tables ---------- */
+/* ========== TABLES ========== */
 .stDataFrame { 
     border-radius: var(--radius-md); 
     overflow: hidden;
@@ -438,7 +484,7 @@ p, span, label, div {
     font-size: 0.88rem !important;
 }
 
-/* ---------- Buttons ---------- */
+/* ========== BUTTONS (MAIN CONTENT) ========== */
 .stButton > button {
     background: linear-gradient(135deg, var(--violet) 0%, var(--violet-dark) 100%);
     color: white !important;
@@ -485,49 +531,7 @@ p, span, label, div {
     background: rgba(99, 102, 241, 0.04) !important;
 }
 
-/* ---------- Form Inputs ---------- */
-.stTextInput > div > div > input,
-.stNumberInput > div > div > input,
-.stSelectbox > div > div > div,
-.stTextArea > div > div > textarea {
-    background: var(--surface) !important;
-    border: 1.5px solid rgba(15, 23, 42, 0.1) !important;
-    border-radius: var(--radius-sm) !important;
-    padding: 0.7rem 1rem !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 0.9rem !important;
-    transition: all 0.2s ease !important;
-    box-shadow: var(--shadow-sm) !important;
-}
-
-.stTextInput > div > div > input:focus,
-.stNumberInput > div > div > input:focus,
-.stSelectbox > div > div > div:focus-within,
-.stTextArea > div > div > textarea:focus {
-    border-color: var(--violet) !important;
-    box-shadow: 
-        0 0 0 3px rgba(99, 102, 241, 0.1),
-        var(--shadow-sm) !important;
-    outline: none !important;
-}
-
-/* ---------- Form Labels - MORE VISIBLE ---------- */
-.stTextInput label,
-.stNumberInput label,
-.stSelectbox label,
-.stTextArea label,
-.stFileUploader label,
-.stDateInput label {
-    font-weight: 700 !important;
-    font-size: 0.78rem !important;
-    color: var(--slate-dark) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.06em !important;
-    margin-bottom: 0.5rem !important;
-    display: block !important;
-}
-
-/* ---------- Login Box ---------- */
+/* ========== LOGIN BOX ========== */
 .login-shell {
     max-width: 440px;
     margin: 5vh auto 0;
@@ -593,7 +597,7 @@ p, span, label, div {
     border: 1px solid rgba(99, 102, 241, 0.15);
 }
 
-/* ---------- Receipt / Struk ---------- */
+/* ========== RECEIPT / STRUK ========== */
 .struk-card {
     background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
     backdrop-filter: blur(16px);
@@ -634,7 +638,7 @@ p, span, label, div {
     font-size: 1.1rem;
 }
 
-/* ---------- Section Dividers ---------- */
+/* ========== SECTION DIVIDERS ========== */
 .section-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.2), transparent);
@@ -642,7 +646,7 @@ p, span, label, div {
     border: none;
 }
 
-/* ---------- Tabs ---------- */
+/* ========== TABS ========== */
 .stTabs [data-baseweb="tab-list"] {
     gap: 8px !important;
     background: rgba(255, 255, 255, 0.5) !important;
@@ -666,7 +670,7 @@ p, span, label, div {
     color: var(--violet) !important;
 }
 
-/* ---------- Metrics ---------- */
+/* ========== METRICS ========== */
 [data-testid="stMetric"] {
     background: var(--surface) !important;
     padding: 1.2rem 1.4rem !important;
@@ -696,7 +700,7 @@ p, span, label, div {
     font-family: 'Manrope', sans-serif !important;
 }
 
-/* ---------- Alerts / Messages ---------- */
+/* ========== ALERTS / MESSAGES ========== */
 .stAlert {
     border-radius: var(--radius-md) !important;
     border: 1px solid var(--border-subtle) !important;
@@ -704,7 +708,7 @@ p, span, label, div {
     padding: 1rem 1.2rem !important;
 }
 
-/* ---------- File Uploader ---------- */
+/* ========== FILE UPLOADER ========== */
 .stFileUploader > div {
     background: var(--surface) !important;
     border: 2px dashed rgba(99, 102, 241, 0.25) !important;
@@ -718,12 +722,12 @@ p, span, label, div {
     background: rgba(99, 102, 241, 0.02) !important;
 }
 
-/* ---------- Hide Streamlit Branding ---------- */
+/* ========== HIDE STREAMLIT BRANDING ========== */
 #MainMenu, header, footer { 
     visibility: hidden !important;
 }
 
-/* ---------- Scrollbar Styling ---------- */
+/* ========== SCROLLBAR STYLING ========== */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -742,13 +746,13 @@ p, span, label, div {
     background: rgba(99, 102, 241, 0.4);
 }
 
-/* ---------- Plotly Charts Container ---------- */
+/* ========== PLOTLY CHARTS CONTAINER ========== */
 .js-plotly-plot {
     border-radius: var(--radius-md);
     overflow: hidden;
 }
 
-/* ---------- Responsive Adjustments ---------- */
+/* ========== RESPONSIVE ADJUSTMENTS ========== */
 @media (max-width: 768px) {
     .main-header {
         padding: 1.5rem 1.8rem;
@@ -878,7 +882,7 @@ def dashboard_page():
     st.markdown(f"""
     <div class="stats-scroll-container">
         <div class="stat-card">
-            <h3>Transaksi Hari Ini <span class="icon"></span></h3>
+            <h3>Transaksi Hari Ini <span class="icon">📋</span></h3>
             <div class="value">{trx_hari_ini}</div>
         </div>
         <div class="stat-card green">
@@ -894,7 +898,7 @@ def dashboard_page():
             <div class="value" style="font-size:1.4rem;">{format_rp(pendapatan)}</div>
         </div>
         <div class="stat-card red">
-            <h3>Pelanggan <span class="icon">👥</span></h3>
+            <h3>Pelanggan <span class="icon"></span></h3>
             <div class="value">{total_pelanggan}</div>
         </div>
     </div>
@@ -905,7 +909,7 @@ def dashboard_page():
     col1, col2 = st.columns(2)
 
     with col1:
-        glass_open("📈 Transaksi 7 Hari Terakhir")
+        glass_open(" Transaksi 7 Hari Terakhir")
         df_trx = get_df("""
             SELECT tgl_sewa, COUNT(*) as jumlah 
             FROM transaksi 
@@ -923,7 +927,7 @@ def dashboard_page():
         glass_close()
 
     with col2:
-        glass_open("🏍️ Status Motor")
+        glass_open("️ Status Motor")
         df_status = get_df("SELECT status, COUNT(*) as jumlah FROM motor GROUP BY status")
         if df_status.empty:
             st.info("Belum ada data motor.")
@@ -970,7 +974,7 @@ def dashboard_page():
 
 # ============ MOTOR PAGE ============
 def motor_page():
-    section_header("Armada", "️ Manajemen Motor", "Kelola data, status, dan foto armada motor rental")
+    section_header("Armada", "🏍️ Manajemen Motor", "Kelola data, status, dan foto armada motor rental")
 
     glass_open()
     col1, col2 = st.columns([2, 1])
@@ -1199,7 +1203,7 @@ def transaksi_page():
 
                     st.markdown(f"""
                     <div class="struk-card">
-                        <h3> STRUK SEWA MOTOR</h3>
+                        <h3>🧾 STRUK SEWA MOTOR</h3>
                         <hr>
                         <p><b>Tanggal:</b> {datetime.now().strftime('%d-%m-%Y %H:%M')}</p>
                         <p><b>Motor:</b> {motor_sel}</p>
@@ -1231,7 +1235,7 @@ def transaksi_page():
             selected = st.selectbox("Pilih Transaksi untuk Dikembalikan", trx_aktif['id'].tolist())
             tgl_kembali = st.date_input("Tanggal Kembali", datetime.now())
 
-            if st.button("🔄 Proses Pengembalian"):
+            if st.button(" Proses Pengembalian"):
                 trx = trx_aktif[trx_aktif['id']==selected].iloc[0]
                 tgl_sewa = datetime.strptime(trx['tgl_sewa'], '%Y-%m-%d')
                 diff = (datetime.combine(tgl_kembali, datetime.min.time()) - tgl_sewa).days
@@ -1277,7 +1281,7 @@ def transaksi_page():
 
 # ============ LAPORAN PAGE ============
 def laporan_page():
-    section_header("Insight", "📊 Laporan Cabang", "Laporan transaksi dan pendapatan per periode")
+    section_header("Insight", " Laporan Cabang", "Laporan transaksi dan pendapatan per periode")
 
     glass_open()
     c1, c2, c3 = st.columns(3)
@@ -1316,7 +1320,7 @@ def laporan_page():
     st.markdown(f"""
     <div class="stats-scroll-container">
         <div class="stat-card">
-            <h3>Total Transaksi <span class="icon">📊</span></h3>
+            <h3>Total Transaksi <span class="icon"></span></h3>
             <div class="value">{len(df)}</div>
         </div>
         <div class="stat-card purple">
@@ -1364,7 +1368,7 @@ def admin_page():
     st.markdown(f"""
     <div class="stats-scroll-container">
         <div class="stat-card">
-            <h3>Total Cabang <span class="icon">🏢</span></h3>
+            <h3>Total Cabang <span class="icon"></span></h3>
             <div class="value">{total_cabang}</div>
         </div>
         <div class="stat-card green">
@@ -1376,7 +1380,7 @@ def admin_page():
             <div class="value">{total_pelanggan}</div>
         </div>
         <div class="stat-card purple">
-            <h3>Pendapatan <span class="icon">💰</span></h3>
+            <h3>Pendapatan <span class="icon"></span></h3>
             <div class="value" style="font-size:1.15rem;">{format_rp(total_pendapatan)}</div>
         </div>
     </div>
@@ -1416,7 +1420,7 @@ def admin_page():
             st.plotly_chart(fig, use_container_width=True)
         glass_close()
 
-    glass_open("🔄 Status Sinkronisasi Cabang")
+    glass_open(" Status Sinkronisasi Cabang")
     sync_data = pd.DataFrame({
         'Cabang': ['Cabang Asoka', 'Cabang Pusat'],
         'Status': ['🟢 Online', '🟢 Online'],
@@ -1472,25 +1476,23 @@ def main():
                     border-radius:12px; padding:0.8rem 1rem; margin-bottom:0.8rem;">
             <div style="color:#FFFFFF; font-weight:700; font-size:0.95rem;">👤 {st.session_state.user['username']}</div>
             <div style="color:#FFFFFF; opacity:0.85; font-size:0.8rem; margin-top:0.25rem;">🏷️ {st.session_state.user['role'].capitalize()}</div>
-            <div style="color:#FFFFFF; opacity:0.85; font-size:0.8rem;">🏢 {st.session_state.user['cabang']}</div>
+            <div style="color:#FFFFFF; opacity:0.85; font-size:0.8rem;"> {st.session_state.user['cabang']}</div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown("---")
 
         if st.session_state.user['role'] == 'admin':
-            menu = st.radio("Menu", ["📊 Dashboard", "📈 Laporan", "🏢 Admin Pusat"], label_visibility="collapsed")
+            menu = st.radio("Menu", [" Dashboard", "📈 Laporan", " Admin Pusat"], label_visibility="collapsed")
         else:
-            menu = st.radio("Menu", ["🏍️ Motor", " Pelanggan", "🧾 Transaksi"], label_visibility="collapsed")
+            menu = st.radio("Menu", ["️ Motor", "👥 Pelanggan", "🧾 Transaksi"], label_visibility="collapsed")
 
         st.markdown("---")
         
-        # Logout button with wrapper for custom styling
-        st.markdown('<div class="logout-wrapper">', unsafe_allow_html=True)
+        # Logout button
         if st.button("🚪 Logout", use_container_width=True, key="logout_btn"):
             st.session_state.logged_in = False
             st.session_state.user = None
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown("""
         <div style="position:fixed; bottom:18px; left:24px; color:#FFFFFF; opacity:0.6; font-size:0.72rem;">
